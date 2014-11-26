@@ -275,7 +275,6 @@ void thread_init(void)
     void *addr;
     BOOL suspend;
     SIZE_T size, info_size;
-    LARGE_INTEGER now;
     NTSTATUS status;
     struct ntdll_thread_data *thread_data;
 
@@ -364,7 +363,23 @@ void thread_init(void)
     init_directories();
     init_user_process_params( info_size );
 
-    /* initialize time values in user_shared_data */
+	/* initialize user_shared_data */
+    __wine_user_shared_data();
+    fill_cpu_info();
+
+    NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );
+}
+
+
+
+/**************************************************************************
+ *  __wine_user_shared_data   (NTDLL.@)
+ *
+ * Update user shared data and return the address of the structure.
+ */
+BYTE* CDECL __wine_user_shared_data(void)
+{
+    LARGE_INTEGER now;
     NtQuerySystemTime( &now );
     user_shared_data->SystemTime.LowPart = now.u.LowPart;
     user_shared_data->SystemTime.High1Time = user_shared_data->SystemTime.High2Time = now.u.HighPart;
@@ -372,10 +387,7 @@ void thread_init(void)
     user_shared_data->u.TickCount.High2Time = user_shared_data->u.TickCount.High1Time;
     user_shared_data->TickCountLowDeprecated = user_shared_data->u.TickCount.LowPart;
     user_shared_data->TickCountMultiplier = 1 << 24;
-
-    fill_cpu_info();
-
-    NtCreateKeyedEvent( &keyed_event, GENERIC_READ | GENERIC_WRITE, NULL, 0 );
+    return (BYTE *)user_shared_data;
 }
 
 BOOL read_process_memory_stats(int unix_pid, VM_COUNTERS *pvmi)
