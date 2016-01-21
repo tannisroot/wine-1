@@ -61,6 +61,7 @@ static const char usage[] =
 "   -m32, -m64         Set the target architecture (Win32 or Win64)\n"
 "   -N                 Do not preprocess input\n"
 "   --oldnames         Use old naming conventions\n"
+"   --oldtlb           Use old typelib (SLTG) format\n"
 "   -o, --output=NAME  Set the output file name\n"
 "   -Otype             Type of stubs to generate (-Os, -Oi, -Oif)\n"
 "   -p                 Generate proxy\n"
