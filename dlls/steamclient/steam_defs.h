@@ -10,10 +10,20 @@ typedef int EGamepadTextInputLineMode;
 typedef int EVoiceResult;
 typedef int EBeginAuthSessionResult;
 typedef int EUserHasLicenseForAppResult;
+typedef int EPersonaState;
+typedef int EFriendRelationship;
+typedef int EPersonaState;
+typedef int EOverlayToStoreFlag;
+typedef int EChatEntryType;
 
-/* these are 64-bit PODs */
+/* these are PODs, so just copy the data. hopefully the
+ * packing and alignment are the same... */
 typedef struct CSteamID { unsigned char a[8]; } CSteamID;
 typedef struct CGameID { unsigned char a[8]; } CGameID;
+
+/* never dereferenced */
+struct FriendGameInfo_t;
+typedef struct FriendGameInfo_t FriendGameInfo_t;
 
 typedef int ISteamUser; /* TODO */
 typedef int ISteamGameServer; /* TODO */

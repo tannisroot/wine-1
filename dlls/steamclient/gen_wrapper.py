@@ -56,10 +56,11 @@ sdk_versions = [
 
 files = [
     # header file to parse, classes to generate from that header, addl headers needed for CPP files
+    ("isteamappticket", ["ISteamAppTicket"], ["isteamappticket.h"]),
     ("isteamclient", ["ISteamClient"], []),
+    ("isteamfriends", ["ISteamFriends"], []),
     ("isteamuser", ["ISteamUser"], []),
     ("isteamutils", ["ISteamUtils"], []),
-    ("isteamappticket", ["ISteamAppTicket"], ["isteamappticket.h"]),
 ]
 
 class_versions = {}
@@ -95,13 +96,10 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
     unnamed = 'a'
     for param in list(method.get_children()):
         if param.kind == clang.cindex.CursorKind.PARM_DECL:
-            # they don't give names for some fn pointer args, so just void * them since
-            # we don't dereference them anyway
-            # TODO: probably need to fix this so linux can call into win32 code
-            if param.type.kind == clang.cindex.TypeKind.POINTER and param.spelling == "":
-                f.write(", void *%s" % unnamed)
-                cpp.write(", void *%s" % unnamed)
-                cpp_h.write(", void *")
+            if param.spelling == "":
+                f.write(", %s _%s" % (param.type.spelling, unnamed))
+                cpp.write(", %s _%s" % (param.type.spelling, unnamed))
+                cpp_h.write(", %s" % param.type.spelling)
                 unnamed = chr(ord(unnamed) + 1)
             else:
                 f.write(", %s %s" % (param.type.spelling, param.spelling))
@@ -137,9 +135,9 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
                 cpp.write(", ")
             else:
                 first = False
-            if param.type.kind == clang.cindex.TypeKind.POINTER and param.spelling == "":
-                f.write(", %s" % unnamed)
-                cpp.write("%s" % unnamed)
+            if param.spelling == "":
+                f.write(", _%s" % unnamed)
+                cpp.write("_%s" % unnamed)
                 unnamed = chr(ord(unnamed) + 1)
             else:
                 f.write(", %s" % param.spelling)

@@ -6,26 +6,36 @@ C_SRCS = \
 	steamclient_main.c \
 	win_isteamappticket.c \
 	win_isteamclient.c \
+	win_isteamfriends.c \
 	win_isteamutils.c \
 	win_isteamuser.c
 
 CPP_SRCS = \
+	cppISteamAppTicket_STEAMAPPTICKET_INTERFACE_VERSION001.cpp \
 	cppISteamClient_SteamClient017.cpp \
+	cppISteamFriends_SteamFriends015.cpp \
 	cppISteamUser_SteamUser019.cpp \
 	cppISteamUtils_SteamUtils008.cpp \
-	cppISteamAppTicket_STEAMAPPTICKET_INTERFACE_VERSION001.cpp \
 	cppISteamUser_SteamUser018.cpp \
 	cppISteamUtils_SteamUtils007.cpp \
 	cppISteamClient_SteamClient016.cpp \
+	cppISteamFriends_SteamFriends014.cpp \
 	cppISteamUser_SteamUser017.cpp \
 	cppISteamClient_SteamClient015.cpp \
 	cppISteamClient_SteamClient014.cpp \
 	cppISteamClient_SteamClient012.cpp \
 	cppISteamUtils_SteamUtils006.cpp \
+	cppISteamFriends_SteamFriends013.cpp \
 	cppISteamUser_SteamUser016.cpp \
 	cppISteamUtils_SteamUtils005.cpp \
+	cppISteamFriends_SteamFriends011.cpp \
 	cppISteamClient_SteamClient011.cpp \
+	cppISteamFriends_SteamFriends009.cpp \
 	cppISteamClient_SteamClient010.cpp \
+	cppISteamFriends_SteamFriends008.cpp \
 	cppISteamUser_SteamUser014.cpp \
 	cppISteamClient_SteamClient009.cpp \
+	cppISteamFriends_SteamFriends007.cpp \
+	cppISteamFriends_SteamFriends006.cpp \
 	cppISteamUser_SteamUser013.cpp \
+	cppISteamFriends_SteamFriends005.cpp \
