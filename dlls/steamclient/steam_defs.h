@@ -28,23 +28,11 @@ typedef struct MatchMakingKeyValuePair_t { unsigned char a[64]; } MatchMakingKey
 typedef struct gameserveritem_t { unsigned char a[372]; } gameserveritem_t;
 
 /* never dereferenced */
-struct FriendGameInfo_t;
 typedef struct FriendGameInfo_t FriendGameInfo_t;
-
-typedef int ISteamUser; /* TODO */
-typedef int ISteamGameServer; /* TODO */
-typedef int ISteamFriends; /* TODO */
-typedef int ISteamUtils; /* TODO */
-typedef int ISteamMatchmaking; /* TODO */
-typedef int ISteamMatchmakingServers; /* TODO */
-typedef int ISteamUserStats; /* TODO */
-typedef int ISteamGameServerStats; /* TODO */
-typedef int ISteamApps; /* TODO */
-typedef int ISteamMatchmakingServerListResponse; /* TODO */
-typedef int ISteamMatchmakingPingResponse;
-typedef int ISteamMatchmakingPlayersResponse;
-typedef int ISteamMatchmakingRulesResponse;
-typedef int ISteamX; /* TODO */
+typedef struct ISteamMatchmakingServerListResponse ISteamMatchmakingServerListResponse;
+typedef struct ISteamMatchmakingPingResponse ISteamMatchmakingPingResponse;
+typedef struct ISteamMatchmakingPlayersResponse ISteamMatchmakingPlayersResponse;
+typedef struct ISteamMatchmakingRulesResponse ISteamMatchmakingRulesResponse;
 
 /* FIXME: we don't care about fn pointer types, just pass 'em through */
 typedef void *SteamAPI_CheckCallbackRegistered_t;
