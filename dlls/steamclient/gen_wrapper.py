@@ -61,12 +61,18 @@ files = [
     ("isteamfriends", ["ISteamFriends"], []),
     ("isteammatchmaking", ["ISteamMatchmaking", "ISteamMatchmakingServers"], []),
     ("isteamuser", ["ISteamUser"], []),
+    ("isteamuserstats", ["ISteamUserStats"], []),
     ("isteamutils", ["ISteamUtils"], []),
 ]
 
 class_versions = {}
 
-def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
+def handle_method(classname, winclassname, cppname, method, cpp, cpp_h, existing_methods):
+    used_name = method.spelling
+    idx = '2'
+    while used_name in existing_methods:
+        used_name = "%s_%s" % (method.spelling, idx)
+        idx = chr(ord(idx) + 1)
     returns_record = method.result_type.get_canonical().kind == clang.cindex.TypeKind.RECORD
     if returns_record:
         parambytes = 8 #_this + return pointer
@@ -75,7 +81,7 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
     for param in list(method.get_children()):
         if param.kind == clang.cindex.CursorKind.PARM_DECL:
             parambytes += param.type.get_size()
-    f.write("DEFINE_THISCALL_WRAPPER(%s_%s, %s)\n" % (winclassname, method.spelling, parambytes))
+    f.write("DEFINE_THISCALL_WRAPPER(%s_%s, %s)\n" % (winclassname, used_name, parambytes))
     cpp_h.write("extern ")
     if method.result_type.spelling.startswith("ISteam"):
         f.write("win%s " % (method.result_type.spelling))
@@ -89,9 +95,9 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
         f.write("%s " % (method.result_type.spelling))
         cpp.write("%s " % (method.result_type.spelling))
         cpp_h.write("%s " % (method.result_type.spelling))
-    f.write('__thiscall %s_%s(%s *_this' % (winclassname, method.spelling, winclassname))
-    cpp.write("%s_%s(void *linux_side" % (cppname, method.spelling))
-    cpp_h.write("%s_%s(void *" % (cppname, method.spelling))
+    f.write('__thiscall %s_%s(%s *_this' % (winclassname, used_name, winclassname))
+    cpp.write("%s_%s(void *linux_side" % (cppname, used_name))
+    cpp_h.write("%s_%s(void *" % (cppname, used_name))
     if returns_record:
         f.write(", %s *_r" % method.result_type.spelling)
     unnamed = 'a'
@@ -121,11 +127,11 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
         cpp.write("    return ")
 
     should_gen_wrapper = method.result_type.spelling.startswith("ISteam") or \
-            method.spelling.startswith("GetISteamGenericInterface")
+            used_name.startswith("GetISteamGenericInterface")
     if should_gen_wrapper:
         f.write("create_win_interface(pchVersion,\n        ")
 
-    f.write("%s_%s(_this->linux_side" % (cppname, method.spelling))
+    f.write("%s_%s(_this->linux_side" % (cppname, used_name))
     cpp.write("((%s*)linux_side)->%s(" % (classname, method.spelling))
     unnamed = 'a'
     first = True
@@ -151,6 +157,7 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
         f.write("    return _r;\n")
     f.write("}\n\n")
     cpp.write("}\n\n")
+    return used_name
 
 def get_iface_version(header_path, classname):
     # ISteamClient -> STEAMCLIENT_INTERFACE_VERSION
@@ -203,8 +210,7 @@ def handle_class(sdkver, header_path, addl_headers, classnode):
           # kind of a hack, won't work if the first method is protected
           methods.append("%s /* protected: %s */" % (methods[0], child.spelling))
        else:
-          handle_method(classnode.spelling, winclassname, cppname, child, cpp, cpp_h)
-          methods.append(child.spelling)
+          methods.append(handle_method(classnode.spelling, winclassname, cppname, child, cpp, cpp_h, methods))
     elif child.kind == clang.cindex.CursorKind.CXX_ACCESS_SPEC_DECL:
        if child.access_specifier == clang.cindex.AccessSpecifier.PROTECTED or \
              child.access_specifier == clang.cindex.AccessSpecifier.PRIVATE:

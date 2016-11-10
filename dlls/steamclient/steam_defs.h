@@ -19,6 +19,10 @@ typedef int ELobbyType;
 typedef int ELobbyDistanceFilter;
 typedef int ELobbyComparison;
 typedef int EMatchMakingServerResponse;
+typedef int ELeaderboardSortMethod;
+typedef int ELeaderboardDisplayType;
+typedef int ELeaderboardDataRequest;
+typedef int ELeaderboardUploadScoreMethod;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
@@ -26,6 +30,7 @@ typedef struct CSteamID { unsigned char a[8]; } CSteamID;
 typedef struct CGameID { unsigned char a[8]; } CGameID;
 typedef struct MatchMakingKeyValuePair_t { unsigned char a[64]; } MatchMakingKeyValuePair_t;
 typedef struct gameserveritem_t { unsigned char a[372]; } gameserveritem_t;
+typedef struct LeaderboardEntry_t { unsigned char a[28]; } LeaderboardEntry_t;
 
 /* never dereferenced */
 typedef struct FriendGameInfo_t FriendGameInfo_t;
@@ -67,6 +72,8 @@ typedef uint32 AccountID_t;
 typedef uint32 PartnerId_t;
 typedef uint64 ManifestId_t;
 typedef uint32 HAuthTicket;
+typedef uint64 SteamLeaderboard_t;
+typedef uint64 SteamLeaderboardEntries_t;
 typedef void * BREAKPAD_HANDLE;
 typedef char compile_time_assert_type[1];
 typedef int32 HSteamPipe;

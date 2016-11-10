@@ -9,6 +9,7 @@ C_SRCS = \
 	win_isteamfriends.c \
 	win_isteammatchmaking.c \
 	win_isteamutils.c \
-	win_isteamuser.c
+	win_isteamuser.c \
+	win_isteamuserstats.c
 
 CPP_SRCS = \
