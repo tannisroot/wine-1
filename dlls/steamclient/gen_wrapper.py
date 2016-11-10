@@ -73,17 +73,14 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
     for param in list(method.get_children()):
         if param.kind == clang.cindex.CursorKind.PARM_DECL:
             parambytes += param.type.get_size()
-    if returns_record:
-        f.write("DEFINE_THISCALL_WRAPPER_RECORD(%s_%s, %s)\n" % (winclassname, method.spelling, parambytes))
-    else:
-        f.write("DEFINE_THISCALL_WRAPPER(%s_%s, %s)\n" % (winclassname, method.spelling, parambytes))
+    f.write("DEFINE_THISCALL_WRAPPER(%s_%s, %s)\n" % (winclassname, method.spelling, parambytes))
     cpp_h.write("extern ")
     if method.result_type.spelling.startswith("ISteam"):
         f.write("win%s " % (method.result_type.spelling))
         cpp.write("void *")
         cpp_h.write("void *")
     elif returns_record:
-        f.write("void ")
+        f.write("%s *" % method.result_type.spelling)
         cpp.write("%s " % (method.result_type.spelling))
         cpp_h.write("%s " % (method.result_type.spelling))
     else:
@@ -151,6 +148,8 @@ def handle_method(classname, winclassname, cppname, method, cpp, cpp_h):
         f.write(")")
     f.write(");\n")
     cpp.write(");\n")
+    if returns_record:
+        f.write("    return _r;\n")
     f.write("}\n\n")
     cpp.write("}\n\n")
 

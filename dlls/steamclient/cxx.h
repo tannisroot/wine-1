@@ -30,14 +30,6 @@
                       "pushl %ecx\n\t" \
                       "pushl %eax\n\t" \
                       "jmp " __ASM_NAME(#func) __ASM_STDCALL(args) )
-#define DEFINE_THISCALL_WRAPPER_RECORD(func,args) \
-    extern void THISCALL(func)(void); \
-    __ASM_GLOBAL_FUNC(__thiscall_ ## func, \
-                      "popl %ebx\n\t" \
-                      "pushl %eax\n\t" \
-                      "pushl %ecx\n\t" \
-                      "pushl %ebx\n\t" \
-                      "jmp " __ASM_NAME(#func) __ASM_STDCALL(args) )
 #else /* __i386__ */
 
 #define THISCALL(func) func
