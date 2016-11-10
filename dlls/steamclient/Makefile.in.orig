@@ -4,6 +4,7 @@ MODULE    = steamclient.dll
 
 C_SRCS = \
 	steamclient_main.c \
+	win_isteamapps.c \
 	win_isteamappticket.c \
 	win_isteamclient.c \
 	win_isteamfriends.c \

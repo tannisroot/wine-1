@@ -56,6 +56,7 @@ sdk_versions = [
 
 files = [
     # header file to parse, classes to generate from that header, addl headers needed for CPP files
+    ("isteamapps", ["ISteamApps"], []),
     ("isteamappticket", ["ISteamAppTicket"], ["isteamappticket.h"]),
     ("isteamclient", ["ISteamClient"], []),
     ("isteamfriends", ["ISteamFriends"], []),
