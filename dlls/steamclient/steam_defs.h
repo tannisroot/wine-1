@@ -15,11 +15,17 @@ typedef int EFriendRelationship;
 typedef int EPersonaState;
 typedef int EOverlayToStoreFlag;
 typedef int EChatEntryType;
+typedef int ELobbyType;
+typedef int ELobbyDistanceFilter;
+typedef int ELobbyComparison;
+typedef int EMatchMakingServerResponse;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
 typedef struct CSteamID { unsigned char a[8]; } CSteamID;
 typedef struct CGameID { unsigned char a[8]; } CGameID;
+typedef struct MatchMakingKeyValuePair_t { unsigned char a[64]; } MatchMakingKeyValuePair_t;
+typedef struct gameserveritem_t { unsigned char a[372]; } gameserveritem_t;
 
 /* never dereferenced */
 struct FriendGameInfo_t;
@@ -34,6 +40,10 @@ typedef int ISteamMatchmakingServers; /* TODO */
 typedef int ISteamUserStats; /* TODO */
 typedef int ISteamGameServerStats; /* TODO */
 typedef int ISteamApps; /* TODO */
+typedef int ISteamMatchmakingServerListResponse; /* TODO */
+typedef int ISteamMatchmakingPingResponse;
+typedef int ISteamMatchmakingPlayersResponse;
+typedef int ISteamMatchmakingRulesResponse;
 typedef int ISteamX; /* TODO */
 
 /* FIXME: we don't care about fn pointer types, just pass 'em through */

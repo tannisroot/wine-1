@@ -59,6 +59,7 @@ files = [
     ("isteamappticket", ["ISteamAppTicket"], ["isteamappticket.h"]),
     ("isteamclient", ["ISteamClient"], []),
     ("isteamfriends", ["ISteamFriends"], []),
+    ("isteammatchmaking", ["ISteamMatchmaking", "ISteamMatchmakingServers"], []),
     ("isteamuser", ["ISteamUser"], []),
     ("isteamutils", ["ISteamUtils"], []),
 ]

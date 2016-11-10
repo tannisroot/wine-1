@@ -7,6 +7,7 @@ C_SRCS = \
 	win_isteamappticket.c \
 	win_isteamclient.c \
 	win_isteamfriends.c \
+	win_isteammatchmaking.c \
 	win_isteamutils.c \
 	win_isteamuser.c
 
