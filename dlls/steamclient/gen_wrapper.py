@@ -254,8 +254,8 @@ for sdkver in sdk_versions:
             continue
         sys.stdout.write("about to parse %s\n" % input_name)
         index = clang.cindex.Index.create()
-        tu = index.parse(input_name, args=['-x', 'c++', '-m32', '-Isteamworks_sdk_%s/' % sdkver])
-    
+        tu = index.parse(input_name, args=['-x', 'c++', '-m32', '-Isteamworks_sdk_%s/' % sdkver, '-I/usr/lib/clang/3.9.0/include/'])
+
         diagnostics = list(tu.diagnostics)
         if len(diagnostics) > 0:
             print 'There were parse errors'
