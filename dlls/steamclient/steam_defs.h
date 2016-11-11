@@ -25,6 +25,13 @@ typedef int ELeaderboardDataRequest;
 typedef int ELeaderboardUploadScoreMethod;
 typedef int EP2PSend;
 typedef int ESNetSocketConnectionType;
+typedef int ERemoteStoragePublishedFileVisibility;
+typedef int EWorkshopFileAction;
+typedef int EWorkshopEnumerationType;
+typedef int ERemoteStoragePlatform;
+typedef int EUGCReadAction;
+typedef int EWorkshopFileType;
+typedef int EWorkshopVideoProvider;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
@@ -33,14 +40,17 @@ typedef struct CGameID { unsigned char a[8]; } CGameID;
 typedef struct MatchMakingKeyValuePair_t { unsigned char a[64]; } MatchMakingKeyValuePair_t;
 typedef struct gameserveritem_t { unsigned char a[372]; } gameserveritem_t;
 typedef struct LeaderboardEntry_t { unsigned char a[28]; } LeaderboardEntry_t;
+typedef struct RemoteStorageUpdatePublishedFileRequest_t { unsigned char a[40]; } RemoteStorageUpdatePublishedFileRequest_t;
 
 /* never dereferenced */
 typedef struct FriendGameInfo_t FriendGameInfo_t;
 typedef struct P2PSessionState_t P2PSessionState_t;
+typedef struct SteamParamStringArray_t SteamParamStringArray_t;
 typedef struct ISteamMatchmakingServerListResponse ISteamMatchmakingServerListResponse;
 typedef struct ISteamMatchmakingPingResponse ISteamMatchmakingPingResponse;
 typedef struct ISteamMatchmakingPlayersResponse ISteamMatchmakingPlayersResponse;
 typedef struct ISteamMatchmakingRulesResponse ISteamMatchmakingRulesResponse;
+typedef struct RemoteStorageUpdatePublishedFileRequest_t RemoteStorageUpdatePublishedFileRequest_t;
 
 /* FIXME: we don't care about fn pointer types, just pass 'em through */
 typedef void *SteamAPI_CheckCallbackRegistered_t;
@@ -88,3 +98,5 @@ typedef uint64 UGCHandle_t;
 typedef uint64 PublishedFileUpdateHandle_t;
 typedef uint32 SNetListenSocket_t;
 typedef uint32 SNetSocket_t;
+typedef uint64 PublishedFileId_t;
+typedef uint64 UGCFileWriteStreamHandle_t;

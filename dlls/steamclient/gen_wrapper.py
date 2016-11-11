@@ -61,7 +61,9 @@ files = [
         "ISteamClient",
         "ISteamFriends",
         "ISteamMatchmaking",
+        "ISteamMatchmakingServers",
         "ISteamNetworking",
+        "ISteamRemoteStorage",
         "ISteamUser",
         "ISteamUserStats",
         "ISteamUtils"
@@ -70,6 +72,8 @@ files = [
         "ISteamAppTicket"
     ]),
 ]
+
+print_sizes = [ "RemoteStorageUpdatePublishedFileRequest_t" ]
 
 #files = [
 #    # header file to parse, classes to generate from that header, addl headers needed for CPP files
@@ -328,6 +332,8 @@ for sdkver in sdk_versions:
             for child in children:
                 if child.kind == clang.cindex.CursorKind.CLASS_DECL and child.displayname in classes:
                     handle_class(sdkver, child)
+                if child.displayname in print_sizes:
+                    sys.stdout.write("size of %s is %u\n" % (child.displayname, child.type.get_size()))
 
 #todo
 m = open("Makefile.in", "a")
