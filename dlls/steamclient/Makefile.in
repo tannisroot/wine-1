@@ -14,6 +14,7 @@ C_SRCS = \
 	winISteamUserStats.c \
 	winISteamApps.c \
 	winISteamNetworking.c \
+	winISteamScreenshots.c \
 	winISteamAppTicket.c \
 
 CPP_SRCS = \
@@ -27,8 +28,10 @@ CPP_SRCS = \
 	cppISteamUserStats_STEAMUSERSTATS_INTERFACE_VERSION011.cpp \
 	cppISteamApps_STEAMAPPS_INTERFACE_VERSION008.cpp \
 	cppISteamNetworking_SteamNetworking005.cpp \
+	cppISteamScreenshots_STEAMSCREENSHOTS_INTERFACE_VERSION003.cpp \
 	cppISteamAppTicket_STEAMAPPTICKET_INTERFACE_VERSION001.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION013.cpp \
+	cppISteamScreenshots_STEAMSCREENSHOTS_INTERFACE_VERSION002.cpp \
 	cppISteamUser_SteamUser018.cpp \
 	cppISteamUtils_SteamUtils007.cpp \
 	cppISteamApps_STEAMAPPS_INTERFACE_VERSION007.cpp \
@@ -47,6 +50,7 @@ CPP_SRCS = \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION010.cpp \
 	cppISteamUser_SteamUser016.cpp \
 	cppISteamUtils_SteamUtils005.cpp \
+	cppISteamScreenshots_STEAMSCREENSHOTS_INTERFACE_VERSION001.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION008.cpp \
 	cppISteamFriends_SteamFriends011.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION006.cpp \

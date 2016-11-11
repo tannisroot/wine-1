@@ -32,6 +32,7 @@ typedef int ERemoteStoragePlatform;
 typedef int EUGCReadAction;
 typedef int EWorkshopFileType;
 typedef int EWorkshopVideoProvider;
+typedef int EVRScreenshotType;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
@@ -100,3 +101,4 @@ typedef uint32 SNetListenSocket_t;
 typedef uint32 SNetSocket_t;
 typedef uint64 PublishedFileId_t;
 typedef uint64 UGCFileWriteStreamHandle_t;
+typedef uint32 ScreenshotHandle;
