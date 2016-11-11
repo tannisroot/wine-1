@@ -61,7 +61,7 @@ files = [
         "ISteamClient",
         "ISteamFriends",
         "ISteamMatchmaking",
-#        "ISteamNetworking",
+        "ISteamNetworking",
         "ISteamUser",
         "ISteamUserStats",
         "ISteamUtils"

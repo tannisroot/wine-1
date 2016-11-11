@@ -23,6 +23,8 @@ typedef int ELeaderboardSortMethod;
 typedef int ELeaderboardDisplayType;
 typedef int ELeaderboardDataRequest;
 typedef int ELeaderboardUploadScoreMethod;
+typedef int EP2PSend;
+typedef int ESNetSocketConnectionType;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
@@ -34,6 +36,7 @@ typedef struct LeaderboardEntry_t { unsigned char a[28]; } LeaderboardEntry_t;
 
 /* never dereferenced */
 typedef struct FriendGameInfo_t FriendGameInfo_t;
+typedef struct P2PSessionState_t P2PSessionState_t;
 typedef struct ISteamMatchmakingServerListResponse ISteamMatchmakingServerListResponse;
 typedef struct ISteamMatchmakingPingResponse ISteamMatchmakingPingResponse;
 typedef struct ISteamMatchmakingPlayersResponse ISteamMatchmakingPlayersResponse;
@@ -83,3 +86,5 @@ typedef void * HServerListRequest;
 typedef int HServerQuery;
 typedef uint64 UGCHandle_t;
 typedef uint64 PublishedFileUpdateHandle_t;
+typedef uint32 SNetListenSocket_t;
+typedef uint32 SNetSocket_t;
