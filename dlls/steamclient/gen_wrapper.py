@@ -60,6 +60,7 @@ files = [
         "ISteamApps",
         "ISteamClient",
         "ISteamFriends",
+        "ISteamHTTP",
         "ISteamMatchmaking",
         "ISteamMatchmakingServers",
         "ISteamNetworking",
