@@ -1,8 +1,8 @@
 #!/bin/bash
 
-rm win_*.h
-rm win_*.c
-rm win_*.dat
+rm win*.h
+rm win*.c
+rm win*.dat
 rm cpp*.cpp
 rm cpp*.h
 

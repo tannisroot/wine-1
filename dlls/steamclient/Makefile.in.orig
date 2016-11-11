@@ -3,14 +3,4 @@ MODULE    = steamclient.dll
 
 
 C_SRCS = \
-	steamclient_main.c \
-	win_isteamapps.c \
-	win_isteamappticket.c \
-	win_isteamclient.c \
-	win_isteamfriends.c \
-	win_isteammatchmaking.c \
-	win_isteamutils.c \
-	win_isteamuser.c \
-	win_isteamuserstats.c
-
-CPP_SRCS = \
+	 steamclient_main.c \
