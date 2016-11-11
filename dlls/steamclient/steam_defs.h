@@ -34,6 +34,7 @@ typedef int EWorkshopFileType;
 typedef int EWorkshopVideoProvider;
 typedef int EVRScreenshotType;
 typedef int EHTTPMethod;
+typedef int EResult;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
@@ -105,3 +106,4 @@ typedef uint64 UGCFileWriteStreamHandle_t;
 typedef uint32 ScreenshotHandle;
 typedef uint32 HTTPRequestHandle;
 typedef uint32 HTTPCookieContainerHandle;
+typedef uint64 ClientUnifiedMessageHandle;

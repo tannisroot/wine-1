@@ -66,6 +66,7 @@ files = [
         "ISteamNetworking",
         "ISteamRemoteStorage",
         "ISteamScreenshots",
+        "ISteamUnifiedMessages",
         "ISteamUser",
         "ISteamUserStats",
         "ISteamUtils"
