@@ -17,6 +17,7 @@ C_SRCS = \
 	winISteamScreenshots.c \
 	winISteamHTTP.c \
 	winISteamUnifiedMessages.c \
+	winISteamController.c \
 	winISteamAppTicket.c \
 
 CPP_SRCS = \
@@ -33,13 +34,16 @@ CPP_SRCS = \
 	cppISteamScreenshots_STEAMSCREENSHOTS_INTERFACE_VERSION003.cpp \
 	cppISteamHTTP_STEAMHTTP_INTERFACE_VERSION002.cpp \
 	cppISteamUnifiedMessages_STEAMUNIFIEDMESSAGES_INTERFACE_VERSION001.cpp \
+	cppISteamController_SteamController004.cpp \
 	cppISteamAppTicket_STEAMAPPTICKET_INTERFACE_VERSION001.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION013.cpp \
 	cppISteamScreenshots_STEAMSCREENSHOTS_INTERFACE_VERSION002.cpp \
+	cppISteamController_SteamController003.cpp \
 	cppISteamUser_SteamUser018.cpp \
 	cppISteamUtils_SteamUtils007.cpp \
 	cppISteamApps_STEAMAPPS_INTERFACE_VERSION007.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION012.cpp \
+	cppISteamController_STEAMCONTROLLER_INTERFACE_VERSION.cpp \
 	cppISteamClient_SteamClient016.cpp \
 	cppISteamUser_SteamUser017.cpp \
 	cppISteamFriends_SteamFriends014.cpp \

@@ -35,6 +35,8 @@ typedef int EWorkshopVideoProvider;
 typedef int EVRScreenshotType;
 typedef int EHTTPMethod;
 typedef int EResult;
+typedef int ESteamControllerPad;
+typedef int EControllerActionOrigin;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
@@ -44,6 +46,9 @@ typedef struct MatchMakingKeyValuePair_t { unsigned char a[64]; } MatchMakingKey
 typedef struct gameserveritem_t { unsigned char a[372]; } gameserveritem_t;
 typedef struct LeaderboardEntry_t { unsigned char a[28]; } LeaderboardEntry_t;
 typedef struct RemoteStorageUpdatePublishedFileRequest_t { unsigned char a[40]; } RemoteStorageUpdatePublishedFileRequest_t;
+typedef struct ControllerAnalogActionData_t { unsigned char a[13]; } ControllerAnalogActionData_t;
+typedef struct ControllerDigitalActionData_t { unsigned char a[2]; } ControllerDigitalActionData_t;
+typedef struct ControllerMotionData_t { unsigned char a[40]; } ControllerMotionData_t;
 
 /* never dereferenced */
 typedef struct FriendGameInfo_t FriendGameInfo_t;
@@ -54,6 +59,7 @@ typedef struct ISteamMatchmakingPingResponse ISteamMatchmakingPingResponse;
 typedef struct ISteamMatchmakingPlayersResponse ISteamMatchmakingPlayersResponse;
 typedef struct ISteamMatchmakingRulesResponse ISteamMatchmakingRulesResponse;
 typedef struct RemoteStorageUpdatePublishedFileRequest_t RemoteStorageUpdatePublishedFileRequest_t;
+typedef struct SteamControllerState001_t SteamControllerState001_t;
 
 /* FIXME: we don't care about fn pointer types, just pass 'em through */
 typedef void *SteamAPI_CheckCallbackRegistered_t;
@@ -107,3 +113,7 @@ typedef uint32 ScreenshotHandle;
 typedef uint32 HTTPRequestHandle;
 typedef uint32 HTTPCookieContainerHandle;
 typedef uint64 ClientUnifiedMessageHandle;
+typedef uint64 ControllerHandle_t;
+typedef uint64 ControllerActionSetHandle_t;
+typedef uint64 ControllerAnalogActionHandle_t;
+typedef uint64 ControllerDigitalActionHandle_t;

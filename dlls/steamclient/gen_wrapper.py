@@ -59,6 +59,7 @@ files = [
     ("steam_api.h", [
         "ISteamApps",
         "ISteamClient",
+        "ISteamController",
         "ISteamFriends",
         "ISteamHTTP",
         "ISteamMatchmaking",
@@ -76,7 +77,7 @@ files = [
     ]),
 ]
 
-print_sizes = [ "RemoteStorageUpdatePublishedFileRequest_t" ]
+print_sizes = [ "ControllerMotionData_t" ]
 
 #files = [
 #    # header file to parse, classes to generate from that header, addl headers needed for CPP files
