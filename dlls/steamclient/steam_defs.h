@@ -37,6 +37,15 @@ typedef int EHTTPMethod;
 typedef int EResult;
 typedef int ESteamControllerPad;
 typedef int EControllerActionOrigin;
+typedef int EUserUGCList,
+        EUGCMatchingUGCType,
+        EUserUGCListSortOrder,
+        EUGCQuery,
+        EUGCMatchingUGCType,
+        EItemUpdateStatus,
+        EItemStatistic,
+        EItemPreviewType
+;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
@@ -60,6 +69,7 @@ typedef struct ISteamMatchmakingPlayersResponse ISteamMatchmakingPlayersResponse
 typedef struct ISteamMatchmakingRulesResponse ISteamMatchmakingRulesResponse;
 typedef struct RemoteStorageUpdatePublishedFileRequest_t RemoteStorageUpdatePublishedFileRequest_t;
 typedef struct SteamControllerState001_t SteamControllerState001_t;
+typedef struct SteamUGCDetails_t SteamUGCDetails_t;
 
 /* FIXME: we don't care about fn pointer types, just pass 'em through */
 typedef void *SteamAPI_CheckCallbackRegistered_t;
@@ -117,3 +127,5 @@ typedef uint64 ControllerHandle_t;
 typedef uint64 ControllerActionSetHandle_t;
 typedef uint64 ControllerAnalogActionHandle_t;
 typedef uint64 ControllerDigitalActionHandle_t;
+typedef uint64 UGCQueryHandle_t;
+typedef uint64 UGCUpdateHandle_t;
