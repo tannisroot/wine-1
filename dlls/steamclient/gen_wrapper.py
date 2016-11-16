@@ -62,6 +62,7 @@ files = [
         "ISteamClient",
         "ISteamController",
         "ISteamFriends",
+        "ISteamHTMLSurface",
         "ISteamHTTP",
         "ISteamMatchmaking",
         "ISteamMatchmakingServers",
@@ -134,15 +135,16 @@ def handle_method(cfile, classname, winclassname, cppname, method, cpp, cpp_h, e
     unnamed = 'a'
     for param in list(method.get_children()):
         if param.kind == clang.cindex.CursorKind.PARM_DECL:
+            typename = param.type.spelling.split("::")[-1];
             if param.spelling == "":
-                cfile.write(", %s _%s" % (param.type.spelling, unnamed))
-                cpp.write(", %s _%s" % (param.type.spelling, unnamed))
-                cpp_h.write(", %s" % param.type.spelling)
+                cfile.write(", %s _%s" % (typename, unnamed))
+                cpp.write(", %s _%s" % (typename, unnamed))
+                cpp_h.write(", %s" % typename)
                 unnamed = chr(ord(unnamed) + 1)
             else:
-                cfile.write(", %s %s" % (param.type.spelling, param.spelling))
-                cpp.write(", %s %s" % (param.type.spelling, param.spelling))
-                cpp_h.write(", %s" % (param.type.spelling))
+                cfile.write(", %s %s" % (typename, param.spelling))
+                cpp.write(", %s %s" % (typename, param.spelling))
+                cpp_h.write(", %s" % (typename))
     cfile.write(")\n{\n")
     cpp.write(")\n{\n")
     cpp_h.write(");\n")
@@ -179,7 +181,7 @@ def handle_method(cfile, classname, winclassname, cppname, method, cpp, cpp_h, e
                 unnamed = chr(ord(unnamed) + 1)
             else:
                 cfile.write(", %s" % param.spelling)
-                cpp.write("%s" % param.spelling)
+                cpp.write("(%s)%s" % (param.type.spelling, param.spelling))
     if should_gen_wrapper:
         cfile.write(")")
     cfile.write(");\n")
@@ -243,6 +245,7 @@ WINE_DEFAULT_DEBUG_CHANNEL(steamclient);
 
   cpp = open("%s.cpp" % cppname, "w")
   cpp.write("#include \"steamclient_private.h\"\n")
+  cpp.write("#include \"steam_defs.h\"\n")
   cpp.write("#include \"steamworks_sdk_%s/steam_api.h\"\n" % sdkver)
   if not fname == "steam_api.h":
     cpp.write("#include \"steamworks_sdk_%s/%s\"\n" % (sdkver, fname))

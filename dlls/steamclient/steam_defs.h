@@ -1,4 +1,6 @@
+typedef int EHTMLMouseButton, EHTMLKeyModifiers;
 
+#ifndef __cplusplus
 typedef int bool;
 
 typedef int EAccountType;
@@ -59,6 +61,7 @@ typedef struct RemoteStorageUpdatePublishedFileRequest_t { unsigned char a[40]; 
 typedef struct ControllerAnalogActionData_t { unsigned char a[13]; } ControllerAnalogActionData_t;
 typedef struct ControllerDigitalActionData_t { unsigned char a[2]; } ControllerDigitalActionData_t;
 typedef struct ControllerMotionData_t { unsigned char a[40]; } ControllerMotionData_t;
+typedef struct CallbackMsg_t { unsigned char a[13]; } CallbackMsg_t;
 
 /* never dereferenced */
 typedef struct FriendGameInfo_t FriendGameInfo_t;
@@ -130,3 +133,5 @@ typedef uint64 ControllerAnalogActionHandle_t;
 typedef uint64 ControllerDigitalActionHandle_t;
 typedef uint64 UGCQueryHandle_t;
 typedef uint64 UGCUpdateHandle_t;
+typedef uint32 HHTMLBrowser;
+#endif
