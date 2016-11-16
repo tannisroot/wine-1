@@ -74,6 +74,7 @@ typedef struct ISteamMatchmakingRulesResponse ISteamMatchmakingRulesResponse;
 typedef struct RemoteStorageUpdatePublishedFileRequest_t RemoteStorageUpdatePublishedFileRequest_t;
 typedef struct SteamControllerState001_t SteamControllerState001_t;
 typedef struct SteamUGCDetails_t SteamUGCDetails_t;
+typedef struct SteamItemDetails_t SteamItemDetails_t;
 
 /* FIXME: we don't care about fn pointer types, just pass 'em through */
 typedef void *SteamAPI_CheckCallbackRegistered_t;
@@ -134,4 +135,6 @@ typedef uint64 ControllerDigitalActionHandle_t;
 typedef uint64 UGCQueryHandle_t;
 typedef uint64 UGCUpdateHandle_t;
 typedef uint32 HHTMLBrowser;
+typedef int32 SteamInventoryResult_t, SteamItemDef_t;
+typedef uint64 SteamItemInstanceID_t;
 #endif

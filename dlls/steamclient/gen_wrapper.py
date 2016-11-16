@@ -64,6 +64,7 @@ files = [
         "ISteamFriends",
         "ISteamHTMLSurface",
         "ISteamHTTP",
+        "ISteamInventory",
         "ISteamMatchmaking",
         "ISteamMatchmakingServers",
         "ISteamMusic",
