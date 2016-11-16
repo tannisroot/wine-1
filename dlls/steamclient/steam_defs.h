@@ -46,6 +46,7 @@ typedef int EUserUGCList,
         EItemStatistic,
         EItemPreviewType
 ;
+typedef int AudioPlayback_Status;
 
 /* these are PODs, so just copy the data. hopefully the
  * packing and alignment are the same... */
