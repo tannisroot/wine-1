@@ -16,6 +16,7 @@ C_SRCS = \
 	winISteamNetworking.c \
 	winISteamScreenshots.c \
 	winISteamMusic.c \
+	winISteamMusicRemote.c \
 	winISteamHTTP.c \
 	winISteamUnifiedMessages.c \
 	winISteamController.c \
@@ -36,6 +37,7 @@ CPP_SRCS = \
 	cppISteamNetworking_SteamNetworking005.cpp \
 	cppISteamScreenshots_STEAMSCREENSHOTS_INTERFACE_VERSION003.cpp \
 	cppISteamMusic_STEAMMUSIC_INTERFACE_VERSION001.cpp \
+	cppISteamMusicRemote_STEAMMUSICREMOTE_INTERFACE_VERSION001.cpp \
 	cppISteamHTTP_STEAMHTTP_INTERFACE_VERSION002.cpp \
 	cppISteamUnifiedMessages_STEAMUNIFIEDMESSAGES_INTERFACE_VERSION001.cpp \
 	cppISteamController_SteamController004.cpp \
