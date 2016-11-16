@@ -83,6 +83,9 @@ files = [
     ("isteamgameserver.h", [
         "ISteamGameServer"
     ]),
+    ("isteamgameserverstats.h", [
+        "ISteamGameServerStats"
+    ]),
 ]
 
 print_sizes = [ "ControllerMotionData_t" ]
