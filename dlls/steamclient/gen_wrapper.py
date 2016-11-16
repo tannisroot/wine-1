@@ -80,6 +80,9 @@ files = [
     ("isteamappticket.h", [
         "ISteamAppTicket"
     ]),
+    ("isteamgameserver.h", [
+        "ISteamGameServer"
+    ]),
 ]
 
 print_sizes = [ "ControllerMotionData_t" ]
