@@ -60,7 +60,7 @@ void *create_win_interface(const char *name, void *linux_side)
 static void *steamclient_lib;
 static void *(*steamclient_factory)(const char *name, int *return_code);
 
-void *WINAPI CreateInterface(const char *name, int *return_code)
+void *CDECL CreateInterface(const char *name, int *return_code)
 {
     TRACE("name: %s, return_code: %p\n", name, return_code);
 

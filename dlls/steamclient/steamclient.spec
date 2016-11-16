@@ -5,7 +5,7 @@
 3 stub Breakpad_SteamSetSteamID
 4 stub Breakpad_SteamWriteMiniDumpSetComment
 5 stub Breakpad_SteamWriteMiniDumpUsingExceptionInfoWithBuildId
-6 stdcall CreateInterface(ptr ptr)
+6 cdecl CreateInterface(ptr ptr)
 7 stub Steam_BConnected
 8 stub Steam_BGetCallback
 9 stub Steam_BLoggedOn
