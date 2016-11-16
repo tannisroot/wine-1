@@ -58,6 +58,7 @@ sdk_versions = [
 files = [
     ("steam_api.h", [
         "ISteamApps",
+        "ISteamAppList",
         "ISteamClient",
         "ISteamController",
         "ISteamFriends",
