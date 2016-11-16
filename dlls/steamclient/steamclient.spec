@@ -7,14 +7,14 @@
 5 stub Breakpad_SteamWriteMiniDumpUsingExceptionInfoWithBuildId
 6 cdecl CreateInterface(ptr ptr)
 7 stub Steam_BConnected
-8 stub Steam_BGetCallback
+8 cdecl Steam_BGetCallback(long ptr ptr)
 9 stub Steam_BLoggedOn
 10 stub Steam_BReleaseSteamPipe
 11 stub Steam_ConnectToGlobalUser
 12 stub Steam_CreateGlobalUser
 13 stub Steam_CreateLocalUser
 14 stub Steam_CreateSteamPipe
-15 stub Steam_FreeLastCallback
+15 cdecl Steam_FreeLastCallback(long)
 16 stub Steam_GSBLoggedOn
 17 stub Steam_GSBSecure
 18 stub Steam_GSGetSteam2GetEncryptionKeyToSendToNewClient
@@ -29,7 +29,7 @@
 27 stub Steam_GSSetServerType
 28 stub Steam_GSSetSpawnCount
 29 stub Steam_GSUpdateStatus
-30 stub Steam_GetAPICallResult
+30 cdecl Steam_GetAPICallResult(long int64 ptr long long ptr)
 31 stub Steam_GetGSHandle
 32 stub Steam_InitiateGameConnection
 33 stub Steam_LogOff

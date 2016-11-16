@@ -5,11 +5,13 @@
 #include <stdio.h>
 #include <dlfcn.h>
 #include <limits.h>
+#include <stdint.h>
 
 #include "windef.h"
 #include "winbase.h"
 #include "wine/debug.h"
 #include "wine/library.h"
+#include "steam_defs.h"
 
 #include "steamclient_private.h"
 
@@ -58,31 +60,93 @@ void *create_win_interface(const char *name, void *linux_side)
 }
 
 static void *steamclient_lib;
-static void *(*steamclient_factory)(const char *name, int *return_code);
+static void *(*steamclient_CreateInterface)(const char *name, int *return_code);
+static bool (*steamclient_BGetCallback)(HSteamPipe a, CallbackMsg_t *b, int32 *c);
+static bool (*steamclient_GetAPICallResult)(HSteamPipe, SteamAPICall_t, void *, int, int, bool *);
+static bool (*steamclient_FreeLastCallback)(HSteamPipe);
+
+static int load_steamclient(void)
+{
+    char path[PATH_MAX];
+
+    if(steamclient_lib)
+        return 1;
+
+#ifdef _WIN64
+    snprintf(path, PATH_MAX, "%s/.steam/sdk64/steamclient.so", getenv("HOME"));
+#else
+    snprintf(path, PATH_MAX, "%s/.steam/sdk32/steamclient.so", getenv("HOME"));
+#endif
+    steamclient_lib = wine_dlopen(path, RTLD_NOW, NULL, 0);
+    if(!steamclient_lib){
+        ERR("unable to load steamclient.so\n");
+        return 0;
+    }
+
+    steamclient_CreateInterface = wine_dlsym(steamclient_lib, "CreateInterface", NULL, 0);
+    if(!steamclient_CreateInterface){
+        ERR("unable to load CreateInterface method\n");
+        return 0;
+    }
+
+    steamclient_BGetCallback = wine_dlsym(steamclient_lib, "Steam_BGetCallback", NULL, 0);
+    if(!steamclient_BGetCallback){
+        ERR("unable to load BGetCallback method\n");
+        return 0;
+    }
+
+    steamclient_GetAPICallResult = wine_dlsym(steamclient_lib, "Steam_GetAPICallResult", NULL, 0);
+    if(!steamclient_GetAPICallResult){
+        ERR("unable to load GetAPICallResult method\n");
+        return 0;
+    }
+
+    steamclient_FreeLastCallback = wine_dlsym(steamclient_lib, "Steam_FreeLastCallback", NULL, 0);
+    if(!steamclient_FreeLastCallback){
+        ERR("unable to load FreeLastCallback method\n");
+        return 0;
+    }
+
+    return 1;
+}
 
 void *CDECL CreateInterface(const char *name, int *return_code)
 {
     TRACE("name: %s, return_code: %p\n", name, return_code);
 
-    if(!steamclient_lib){
-        char path[PATH_MAX];
-#ifdef _WIN64
-        snprintf(path, PATH_MAX, "%s/.steam/sdk64/steamclient.so", getenv("HOME"));
-#else
-        snprintf(path, PATH_MAX, "%s/.steam/sdk32/steamclient.so", getenv("HOME"));
-#endif
-        steamclient_lib = wine_dlopen(path, RTLD_NOW, NULL, 0);
-        if(!steamclient_lib){
-            ERR("unable to load steamclient.so\n");
-            return NULL;
-        }
+    if(!load_steamclient())
+        return NULL;
 
-        steamclient_factory = wine_dlsym(steamclient_lib, "CreateInterface", NULL, 0);
-        if(!steamclient_factory){
-            ERR("unable to load class factory method\n");
-            return NULL;
-        }
-    }
+    return create_win_interface(name, steamclient_CreateInterface(name, return_code));
+}
 
-    return create_win_interface(name, steamclient_factory(name, return_code));
+bool CDECL Steam_BGetCallback(HSteamPipe pipe, CallbackMsg_t *msg, int32 *ignored)
+{
+    TRACE("%u, %p, %p\n", pipe, msg, ignored);
+
+    if(!load_steamclient())
+        return 0;
+
+    return steamclient_BGetCallback(pipe, msg, ignored);
+}
+
+bool CDECL Steam_GetAPICallResult(HSteamPipe pipe, SteamAPICall_t call,
+        void *callback, int callback_len, int cb_expected, bool *failed)
+{
+    TRACE("%u, x, %p, %u, %u, %p\n", pipe, callback, callback_len, cb_expected, failed);
+
+    if(!load_steamclient())
+        return 0;
+
+    return steamclient_GetAPICallResult(pipe, call, callback, callback_len, cb_expected, failed);
+}
+
+bool CDECL Steam_FreeLastCallback(HSteamPipe pipe)
+{
+    TRACE("%u\n", pipe);
+
+    if(!load_steamclient())
+        return 0;
+
+    return steamclient_FreeLastCallback(pipe);
 }
