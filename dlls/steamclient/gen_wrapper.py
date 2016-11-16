@@ -76,7 +76,8 @@ files = [
         "ISteamUnifiedMessages",
         "ISteamUser",
         "ISteamUserStats",
-        "ISteamUtils"
+        "ISteamUtils",
+        "ISteamVideo"
     ]),
     ("isteamappticket.h", [
         "ISteamAppTicket"
