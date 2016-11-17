@@ -19,7 +19,7 @@ typedef int32 HSteamPipe;
 // handle to single instance of a steam user
 typedef int32 HSteamUser;
 // function prototype
-#ifdef _LINUX
+#if defined( POSIX ) && !defined( _CYGWIN )
 #define __cdecl
 #endif
 extern "C" typedef void (__cdecl *SteamAPIWarningMessageHook_t)(int, const char *);

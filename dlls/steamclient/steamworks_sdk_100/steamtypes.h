@@ -10,6 +10,13 @@
 #pragma once
 #endif
 
+#if defined( __GNUC__ ) && !defined(POSIX)
+	#if __GNUC__ < 4
+		#error "Steamworks requires GCC 4.X (4.2 or 4.4 have been tested)"
+	#endif
+	#define POSIX 1
+#endif
+
 // Steam-specific types. Defined here so this header file can be included in other code bases.
 #ifndef WCHARTYPES_H
 typedef unsigned char uint8;

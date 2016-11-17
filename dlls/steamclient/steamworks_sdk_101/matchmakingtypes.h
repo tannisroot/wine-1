@@ -15,6 +15,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef POSIX
+#define _snprintf snprintf
+#endif
+
 struct MatchMakingKeyValuePair_t
 {
 	MatchMakingKeyValuePair_t() { m_szKey[0] = m_szValue[0] = 0; }
