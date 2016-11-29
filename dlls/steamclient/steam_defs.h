@@ -1,7 +1,7 @@
 typedef int EHTMLMouseButton, EHTMLKeyModifiers;
 
 #ifndef __cplusplus
-typedef int bool;
+typedef char bool; /* 1 byte on modern visual studio c++ */
 
 typedef int EAccountType;
 typedef int EUniverse;
