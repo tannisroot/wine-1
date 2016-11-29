@@ -186,21 +186,11 @@ bool CDECL Steam_GetAPICallResult(HSteamPipe pipe, SteamAPICall_t call,
         return 0;
 
     lin_callback_len = get_callback_len(cb_expected);
-    ERR("lin cb len: %u\n", lin_callback_len);
     if(!lin_callback_len)
         lin_callback_len = callback_len;
     lin_callback = HeapAlloc(GetProcessHeap(), 0, lin_callback_len);
 
     ret = steamclient_GetAPICallResult(pipe, call, lin_callback, lin_callback_len, cb_expected, failed);
-
-    if(cb_expected == 513){
-        struct abc {
-            int e;
-            int64 id;
-        } *x = lin_callback;
-        ERR("enum: 0x%x, id: 0x%llx\n", x->e, x->id);
-        ERR("addrs: %p %p\n", &x->e, &x->id);
-    }
 
     if(ret){
         switch(cb_expected){
@@ -210,14 +200,6 @@ bool CDECL Steam_GetAPICallResult(HSteamPipe pipe, SteamAPICall_t call,
             memcpy(callback, lin_callback, lin_callback_len);
             break;
         }
-    }
-
-    if(cb_expected == 513){
-        struct winLobbyCreated_t_12 *x = callback;
-        ERR("win enum: 0x%x, id: 0x%llx\n", x->m_eResult, x->m_ulSteamIDLobby);
-        ERR("win addrs: %u %u\n",
-                offsetof(struct winLobbyCreated_t_12, m_eResult),
-                offsetof(struct winLobbyCreated_t_12, m_ulSteamIDLobby));
     }
 
     return ret;

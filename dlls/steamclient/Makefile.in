@@ -81,7 +81,6 @@ CPP_SRCS = \
 	cppISteamClient_SteamClient015.cpp \
 	cppISteamUGC_STEAMUGC_INTERFACE_VERSION002.cpp \
 	cppISteamClient_SteamClient014.cpp \
-	cb_converters_129.cpp \
 	cppISteamClient_SteamClient012.cpp \
 	cppISteamUtils_SteamUtils006.cpp \
 	cb_converters_128.cpp \
@@ -101,7 +100,6 @@ CPP_SRCS = \
 	cppISteamHTTP_STEAMHTTP_INTERFACE_VERSION001.cpp \
 	cppISteamFriends_SteamFriends011.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION006.cpp \
-	cb_converters_119.cpp \
 	cppISteamUserStats_STEAMUSERSTATS_INTERFACE_VERSION010.cpp \
 	cb_converters_118.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION005.cpp \

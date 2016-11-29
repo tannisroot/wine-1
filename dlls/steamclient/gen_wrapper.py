@@ -89,6 +89,15 @@ files = [
     ]),
 ]
 
+# TODO: we could do this automatically by creating temp files and
+# having clang parse those and detect when the MS-style padding results
+# in identical struct widths. But there's only a couple, so let's cheat...
+skip_structs = [
+        "RemoteStorageGetPublishedFileDetailsResult_t_9740",
+        "SteamUGCQueryCompleted_t_20",
+        "SteamUGCRequestUGCDetailsResult_t_9764"
+]
+
 print_sizes = [ "SteamUGCDetails_t" ]
 
 #files = [
@@ -329,6 +338,14 @@ def handle_callback_struct(sdkver, callback, cb_num):
 
     if handler_name in generated_cb_handlers:
         # we already have a handler for the callback struct of this size
+        return
+
+    if handler_name in skip_structs:
+        # due to padding, some structs have the same width across versions of
+        # the SDK. since we key our lin->win conversion on the win struct size,
+        # we can skip the smaller structs and just write into the padding on
+        # older versions
+        # TODO: we could automate this. see comment near skip_structs declaration
         return
 
     cb_id = cb_num | (callback.type.get_size() << 16)
