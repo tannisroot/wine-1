@@ -5,6 +5,9 @@ rm win*.c
 rm win*.dat
 rm cpp*.cpp
 rm cpp*.h
+rm cb*.h
+rm cb*.cpp
+rm cb*.dat
 
 h=$(md5sum Makefile.in)
 cp Makefile.in.orig Makefile.in

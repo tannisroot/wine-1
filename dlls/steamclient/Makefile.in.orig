@@ -1,6 +1,8 @@
 # Generated from /home/valve/steampfx/drive_c/Program Files/Steam/steamclient.dll by winedump.
 MODULE    = steamclient.dll
 
+EXTRADEFS = -Wno-unused-variable
+
 
 C_SRCS = \
 	 steamclient_main.c \

@@ -312,6 +312,72 @@ WINE_DEFAULT_DEBUG_CHANNEL(steamclient);
   constructors.write("    {\"%s\", &create_%s},\n" % (iface_version, winclassname))
 
 
+generated_cb_handlers = []
+
+def handle_callback_struct(sdkver, callback, cb_num):
+    # TODO: callback.get_size() here is the Linux size, which is kinda
+    # confusing.  should be unique either way, though, so it doesn't matter
+    handler_name = "cb_%s_%s" % (callback.displayname, callback.type.get_size())
+
+    if handler_name in generated_cb_handlers:
+        # we already have a handler for the callback struct of this size
+        return
+
+    hfile = open("cb_converters.h", "a")
+    datfile = open("cb_converters.dat", "a")
+
+    filename_base = "cb_converters_%s" % sdkver
+    cppname = "%s.cpp" % filename_base
+    file_exists = os.path.isfile(cppname)
+    cppfile = open(cppname, "a")
+    if not file_exists:
+        generated_cpp_files.append(filename_base)
+        cppfile.write("#include \"steamclient_private.h\"\n")
+        cppfile.write("#include \"steam_defs.h\"\n")
+        cppfile.write("#include \"steamworks_sdk_%s/steam_api.h\"\n" % sdkver)
+        cppfile.write("#include \"steamworks_sdk_%s/isteamgameserver.h\"\n" % (sdkver))
+        if os.path.isfile("steamworks_sdk_%s/isteamgameserverstats.h"):
+            cppfile.write("#include \"steamworks_sdk_%s/isteamgameserverstats.h\"\n" % (sdkver))
+        cppfile.write("#include \"cb_converters.h\"\n")
+
+    hfile.write("void %s(void *l, void *w);\n" % handler_name)
+    datfile.write("case 0x%08x: %s(l, w); return;\n" % ((cb_num | (callback.type.get_size() << 16)), handler_name))
+
+    cppfile.write("#include <pshpack8.h>\n")
+    cppfile.write("struct win%s {\n" % callback.displayname)
+    for m in callback.get_children():
+        if m.kind == clang.cindex.CursorKind.FIELD_DECL:
+            if m.type.kind == clang.cindex.TypeKind.CONSTANTARRAY:
+                cppfile.write("    %s %s[%u];\n" % (m.type.element_type.spelling, m.displayname, m.type.element_count))
+            else:
+                cppfile.write("    %s %s;\n" % (m.type.spelling, m.displayname))
+    cppfile.write("};\n")
+    cppfile.write("#include <poppack.h>\n\n")
+    cppfile.write("void %s(void *l, void *w)\n{\n" % handler_name)
+    cppfile.write("    %s *lin = (%s *)l;\n" % (callback.displayname, callback.displayname))
+    cppfile.write("    struct win%s *win = (struct win%s *)w;\n" % (callback.displayname, callback.displayname))
+    for m in callback.get_children():
+        if m.kind == clang.cindex.CursorKind.FIELD_DECL:
+            if m.type.kind == clang.cindex.TypeKind.CONSTANTARRAY:
+                #TODO: if this is a struct, or packed differently, we'll have to
+                # copy each element in a for-loop
+                cppfile.write("    memcpy(win->%s, lin->%s, sizeof(win->%s));\n" % (m.displayname, m.displayname, m.displayname))
+            else:
+                cppfile.write("    win->%s = lin->%s;\n" % (m.displayname, m.displayname))
+    cppfile.write("}\n\n")
+
+    generated_cb_handlers.append(handler_name)
+
+
+def handle_callback_maybe(sdkver, callback):
+    members = callback.get_children()
+    for c in members:
+        if c.kind == clang.cindex.CursorKind.ENUM_DECL:
+            enums = c.get_children()
+            for e in enums:
+                if e.displayname == "k_iCallback":
+                    handle_callback_struct(sdkver, callback, e.enum_value)
+
 
 
 
@@ -350,6 +416,9 @@ for sdkver in sdk_versions:
             for child in children:
                 if child.kind == clang.cindex.CursorKind.CLASS_DECL and child.displayname in classes:
                     handle_class(sdkver, child)
+                if child.kind == clang.cindex.CursorKind.STRUCT_DECL or \
+                        child.kind == clang.cindex.CursorKind.CLASS_DECL:
+                    handle_callback_maybe(sdkver, child)
                 if child.displayname in print_sizes:
                     sys.stdout.write("size of %s is %u\n" % (child.displayname, child.type.get_size()))
 
