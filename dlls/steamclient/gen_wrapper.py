@@ -100,19 +100,6 @@ skip_structs = [
 
 print_sizes = [ "SteamUGCDetails_t" ]
 
-#files = [
-#    # header file to parse, classes to generate from that header, addl headers needed for CPP files
-#    ("isteamapps", ["ISteamApps"], []),
-#    ("isteamappticket", ["ISteamAppTicket"], ["isteamappticket.h"]),
-#    ("isteamclient", ["ISteamClient"], []),
-#    ("isteamfriends", ["ISteamFriends"], []),
-#    ("isteammatchmaking", ["ISteamMatchmaking", "ISteamMatchmakingServers"], []),
-#    ("isteamnetworking", ["ISteamNetworking"], []),
-#    ("isteamuser", ["ISteamUser"], []),
-#    ("isteamuserstats", ["ISteamUserStats"], []),
-#    ("isteamutils", ["ISteamUtils"], []),
-#]
-
 class_versions = {}
 
 def handle_method(cfile, classname, winclassname, cppname, method, cpp, cpp_h, existing_methods):
@@ -186,7 +173,6 @@ def handle_method(cfile, classname, winclassname, cppname, method, cpp, cpp_h, e
     first = True
     for param in list(method.get_children()):
         if param.kind == clang.cindex.CursorKind.PARM_DECL:
-            # TODO see above
             if not first:
                 cpp.write(", ")
             else:
@@ -223,22 +209,22 @@ def get_iface_version(classname):
     return (ver, False)
 
 def handle_class(sdkver, classnode):
-  children = list(classnode.get_children())
-  if len(children) == 0:
-    return
-  (iface_version, already_generated) = get_iface_version(classnode.spelling)
-  if already_generated:
-    return
-  winname = "win%s" % classnode.spelling
-  if not winname in generated_c_files:
-      generated_c_files.append(winname)
-  cppname = "cpp%s_%s" % (classnode.spelling, iface_version)
-  generated_cpp_files.append(cppname)
+    children = list(classnode.get_children())
+    if len(children) == 0:
+        return
+    (iface_version, already_generated) = get_iface_version(classnode.spelling)
+    if already_generated:
+        return
+    winname = "win%s" % classnode.spelling
+    if not winname in generated_c_files:
+        generated_c_files.append(winname)
+    cppname = "cpp%s_%s" % (classnode.spelling, iface_version)
+    generated_cpp_files.append(cppname)
 
-  file_exists = os.path.isfile("%s.c" % winname)
-  cfile = open("%s.c" % winname, "a")
-  if not file_exists:
-    cfile.write("""/* This file is auto-generated, do not edit. */
+    file_exists = os.path.isfile("%s.c" % winname)
+    cfile = open("%s.c" % winname, "a")
+    if not file_exists:
+        cfile.write("""/* This file is auto-generated, do not edit. */
 
 #include "config.h"
 #include "wine/port.h"
@@ -259,66 +245,66 @@ WINE_DEFAULT_DEBUG_CHANNEL(steamclient);
 
 """)
 
-  cpp = open("%s.cpp" % cppname, "w")
-  cpp.write("#include \"steamclient_private.h\"\n")
-  cpp.write("#include \"steam_defs.h\"\n")
-  cpp.write("#include \"steamworks_sdk_%s/steam_api.h\"\n" % sdkver)
-  if not fname == "steam_api.h":
-    cpp.write("#include \"steamworks_sdk_%s/%s\"\n" % (sdkver, fname))
-  cpp.write("#include \"%s.h\"\n" % cppname)
-  cpp.write("#ifdef __cplusplus\nextern \"C\" {\n#endif\n")
+    cpp = open("%s.cpp" % cppname, "w")
+    cpp.write("#include \"steamclient_private.h\"\n")
+    cpp.write("#include \"steam_defs.h\"\n")
+    cpp.write("#include \"steamworks_sdk_%s/steam_api.h\"\n" % sdkver)
+    if not fname == "steam_api.h":
+        cpp.write("#include \"steamworks_sdk_%s/%s\"\n" % (sdkver, fname))
+    cpp.write("#include \"%s.h\"\n" % cppname)
+    cpp.write("#ifdef __cplusplus\nextern \"C\" {\n#endif\n")
 
-  cpp_h = open("%s.h" % cppname, "w")
-  cpp_h.write("#ifdef __cplusplus\nextern \"C\" {\n#endif\n")
+    cpp_h = open("%s.h" % cppname, "w")
+    cpp_h.write("#ifdef __cplusplus\nextern \"C\" {\n#endif\n")
 
-  winclassname = "win%s_%s" % (classnode.spelling, iface_version)
-  cfile.write("#include \"%s.h\"\n\n" % cppname)
-  cfile.write("typedef struct __%s {\n" % winclassname)
-  cfile.write("    vtable_ptr *vtable;\n")
-  cfile.write("    void *linux_side;\n")
-  cfile.write("} %s;\n\n" % winclassname)
-  methods = []
-  protected = True
-  for child in children:
-    if child.kind == clang.cindex.CursorKind.CXX_METHOD:
-       if protected:
-          # kind of a hack, won't work if the first method is protected
-          methods.append("%s /* protected: %s */" % (methods[0], child.spelling))
-       else:
-          methods.append(handle_method(cfile, classnode.spelling, winclassname, cppname, child, cpp, cpp_h, methods))
-    elif child.kind == clang.cindex.CursorKind.CXX_ACCESS_SPEC_DECL:
-       if child.access_specifier == clang.cindex.AccessSpecifier.PROTECTED or \
-             child.access_specifier == clang.cindex.AccessSpecifier.PRIVATE:
-          protected = True;
-       elif child.access_specifier == clang.cindex.AccessSpecifier.PUBLIC:
-          protected = False;
+    winclassname = "win%s_%s" % (classnode.spelling, iface_version)
+    cfile.write("#include \"%s.h\"\n\n" % cppname)
+    cfile.write("typedef struct __%s {\n" % winclassname)
+    cfile.write("    vtable_ptr *vtable;\n")
+    cfile.write("    void *linux_side;\n")
+    cfile.write("} %s;\n\n" % winclassname)
+    methods = []
+    protected = True
+    for child in children:
+        if child.kind == clang.cindex.CursorKind.CXX_METHOD:
+            if protected:
+                # kind of a hack, won't work if the first method is protected
+                methods.append("%s /* protected: %s */" % (methods[0], child.spelling))
+            else:
+                methods.append(handle_method(cfile, classnode.spelling, winclassname, cppname, child, cpp, cpp_h, methods))
+        elif child.kind == clang.cindex.CursorKind.CXX_ACCESS_SPEC_DECL:
+            if child.access_specifier == clang.cindex.AccessSpecifier.PROTECTED or \
+                    child.access_specifier == clang.cindex.AccessSpecifier.PRIVATE:
+                protected = True;
+            elif child.access_specifier == clang.cindex.AccessSpecifier.PUBLIC:
+                protected = False;
 
-  cfile.write("extern vtable_ptr %s_vtable;\n\n" % winclassname)
-  cfile.write("#ifndef __GNUC__\n")
-  cfile.write("void __asm_dummy_vtables(void) {\n")
-  cfile.write("#endif\n")
-  cfile.write("    __ASM_VTABLE(%s,\n" % winclassname)
-  for method in methods:
-    cfile.write("        VTABLE_ADD_FUNC(%s_%s)\n" % (winclassname, method))
-  cfile.write("    );\n")
-  cfile.write("#ifndef __GNUC__\n")
-  cfile.write("}\n")
-  cfile.write("#endif\n\n")
-  cfile.write("%s *create_%s(void *linux_side)\n{\n" % (winclassname, winclassname))
-  cfile.write("    %s *r = HeapAlloc(GetProcessHeap(), 0, sizeof(%s));\n" % (winclassname, winclassname))
-  cfile.write("    TRACE(\"-> %p\\n\", r);\n")
-  cfile.write("    r->vtable = &%s_vtable;\n" % winclassname)
-  cfile.write("    r->linux_side = linux_side;\n")
-  cfile.write("    return r;\n}\n\n")
+    cfile.write("extern vtable_ptr %s_vtable;\n\n" % winclassname)
+    cfile.write("#ifndef __GNUC__\n")
+    cfile.write("void __asm_dummy_vtables(void) {\n")
+    cfile.write("#endif\n")
+    cfile.write("    __ASM_VTABLE(%s,\n" % winclassname)
+    for method in methods:
+        cfile.write("        VTABLE_ADD_FUNC(%s_%s)\n" % (winclassname, method))
+    cfile.write("    );\n")
+    cfile.write("#ifndef __GNUC__\n")
+    cfile.write("}\n")
+    cfile.write("#endif\n\n")
+    cfile.write("%s *create_%s(void *linux_side)\n{\n" % (winclassname, winclassname))
+    cfile.write("    %s *r = HeapAlloc(GetProcessHeap(), 0, sizeof(%s));\n" % (winclassname, winclassname))
+    cfile.write("    TRACE(\"-> %p\\n\", r);\n")
+    cfile.write("    r->vtable = &%s_vtable;\n" % winclassname)
+    cfile.write("    r->linux_side = linux_side;\n")
+    cfile.write("    return r;\n}\n\n")
 
-  cpp.write("#ifdef __cplusplus\n}\n#endif\n")
-  cpp_h.write("#ifdef __cplusplus\n}\n#endif\n")
+    cpp.write("#ifdef __cplusplus\n}\n#endif\n")
+    cpp_h.write("#ifdef __cplusplus\n}\n#endif\n")
 
-  constructors = open("win_constructors.h", "a")
-  constructors.write("extern void *create_%s(void *);\n" % winclassname)
+    constructors = open("win_constructors.h", "a")
+    constructors.write("extern void *create_%s(void *);\n" % winclassname)
 
-  constructors = open("win_constructors_table.dat", "a")
-  constructors.write("    {\"%s\", &create_%s},\n" % (iface_version, winclassname))
+    constructors = open("win_constructors_table.dat", "a")
+    constructors.write("    {\"%s\", &create_%s},\n" % (iface_version, winclassname))
 
 
 generated_cb_handlers = []
@@ -332,8 +318,6 @@ cb_table = {}
 #TODO: could we optimize this by detecting if the structs are the
 #same layout at generation-time?
 def handle_callback_struct(sdkver, callback, cb_num):
-    # TODO: callback.get_size() here is the Linux size, which is kinda
-    # confusing.  should be unique either way, though, so it doesn't matter
     handler_name = "%s_%s" % (callback.displayname, callback.type.get_size())
 
     if handler_name in generated_cb_handlers:
@@ -483,7 +467,6 @@ for cb in cb_table.keys():
         getapifile.write("    case sizeof(struct win%s): cb_%s(lin_callback, callback); break;\n" % (struct, struct))
     getapifile.write("    }\n    break;\n")
 
-#todo
 m = open("Makefile.in", "a")
 for f in generated_c_files:
     m.write("\t%s.c \\\n" % f)
