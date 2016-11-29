@@ -146,9 +146,9 @@ CPP_SRCS = \
 	cppISteamUtils_SteamUtils002.cpp \
 	cppISteamUserStats_STEAMUSERSTATS_INTERFACE_VERSION004.cpp \
 	cppISteamApps_STEAMAPPS_INTERFACE_VERSION002.cpp \
-	cb_converters_102.cpp \
 	cppISteamFriends_SteamFriends004.cpp \
 	cppISteamMatchmaking_SteamMatchMaking004.cpp \
+	cb_converters_102.cpp \
 	cppISteamUserStats_STEAMUSERSTATS_INTERFACE_VERSION003.cpp \
 	cppISteamNetworking_SteamNetworking001.cpp \
 	cppISteamGameServer_SteamGameServer005.cpp \

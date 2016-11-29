@@ -313,7 +313,14 @@ WINE_DEFAULT_DEBUG_CHANNEL(steamclient);
 
 
 generated_cb_handlers = []
+generated_cb_ids = []
+cpp_files_need_close_brace = []
 
+#because of struct packing differences between win32 and linux, we
+#need to convert these structs from their linux layout to the win32
+#layout.
+#TODO: could we optimize this by detecting if the structs are the
+#same layout at generation-time?
 def handle_callback_struct(sdkver, callback, cb_num):
     # TODO: callback.get_size() here is the Linux size, which is kinda
     # confusing.  should be unique either way, though, so it doesn't matter
@@ -323,8 +330,12 @@ def handle_callback_struct(sdkver, callback, cb_num):
         # we already have a handler for the callback struct of this size
         return
 
-    hfile = open("cb_converters.h", "a")
-    datfile = open("cb_converters.dat", "a")
+    cb_id = cb_num | (callback.type.get_size() << 16)
+    if cb_id in generated_cb_ids:
+        # either this cb changed name, or steam used the same ID for different structs
+        return
+
+    generated_cb_ids.append(cb_id)
 
     filename_base = "cb_converters_%s" % sdkver
     cppname = "%s.cpp" % filename_base
@@ -333,18 +344,23 @@ def handle_callback_struct(sdkver, callback, cb_num):
     if not file_exists:
         generated_cpp_files.append(filename_base)
         cppfile.write("#include \"steamclient_private.h\"\n")
-        cppfile.write("#include \"steam_defs.h\"\n")
         cppfile.write("#include \"steamworks_sdk_%s/steam_api.h\"\n" % sdkver)
         cppfile.write("#include \"steamworks_sdk_%s/isteamgameserver.h\"\n" % (sdkver))
-        if os.path.isfile("steamworks_sdk_%s/isteamgameserverstats.h"):
+        if os.path.isfile("steamworks_sdk_%s/isteamgameserverstats.h" % sdkver):
             cppfile.write("#include \"steamworks_sdk_%s/isteamgameserverstats.h\"\n" % (sdkver))
+        cppfile.write("extern \"C\" {\n")
         cppfile.write("#include \"cb_converters.h\"\n")
+        cpp_files_need_close_brace.append(cppname)
 
-    hfile.write("void %s(void *l, void *w);\n" % handler_name)
-    datfile.write("case 0x%08x: %s(l, w); return;\n" % ((cb_num | (callback.type.get_size() << 16)), handler_name))
+    hfile = open("cb_converters.h", "a")
+    hfile.write("extern void %s(void *l, void *w);\n" % handler_name)
+    hfile.write("extern size_t get_%s_size(void);\n" % handler_name)
+
+    datfile = open("cb_converters.dat", "a")
+    datfile.write("case 0x%08x: win_msg->m_cubParam = get_%s_size(); win_msg->m_pubParam = HeapAlloc(GetProcessHeap(), 0, win_msg->m_cubParam); %s(lin_msg.m_pubParam, win_msg->m_pubParam); break;\n" % (cb_id, handler_name, handler_name))
 
     cppfile.write("#include <pshpack8.h>\n")
-    cppfile.write("struct win%s {\n" % callback.displayname)
+    cppfile.write("struct win%s_%s {\n" % callback.displayname)
     for m in callback.get_children():
         if m.kind == clang.cindex.CursorKind.FIELD_DECL:
             if m.type.kind == clang.cindex.TypeKind.CONSTANTARRAY:
@@ -365,6 +381,8 @@ def handle_callback_struct(sdkver, callback, cb_num):
             else:
                 cppfile.write("    win->%s = lin->%s;\n" % (m.displayname, m.displayname))
     cppfile.write("}\n\n")
+    cppfile.write("size_t get_%s_size(void)\n{\n" % handler_name)
+    cppfile.write("    return sizeof(struct win%s);\n}\n\n" % callback.displayname)
 
     generated_cb_handlers.append(handler_name)
 
@@ -421,6 +439,10 @@ for sdkver in sdk_versions:
                     handle_callback_maybe(sdkver, child)
                 if child.displayname in print_sizes:
                     sys.stdout.write("size of %s is %u\n" % (child.displayname, child.type.get_size()))
+
+for f in cpp_files_need_close_brace:
+    m = open(f, "a")
+    m.write("\n}\n")
 
 #todo
 m = open("Makefile.in", "a")

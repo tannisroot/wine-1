@@ -62,7 +62,6 @@ typedef struct RemoteStorageUpdatePublishedFileRequest_t { unsigned char a[40]; 
 typedef struct ControllerAnalogActionData_t { unsigned char a[13]; } ControllerAnalogActionData_t;
 typedef struct ControllerDigitalActionData_t { unsigned char a[2]; } ControllerDigitalActionData_t;
 typedef struct ControllerMotionData_t { unsigned char a[40]; } ControllerMotionData_t;
-typedef struct CallbackMsg_t { unsigned char a[13]; } CallbackMsg_t;
 
 /* never dereferenced */
 typedef struct FriendGameInfo_t FriendGameInfo_t;
@@ -138,4 +137,14 @@ typedef uint64 UGCUpdateHandle_t;
 typedef uint32 HHTMLBrowser;
 typedef int32 SteamInventoryResult_t, SteamItemDef_t;
 typedef uint64 SteamItemInstanceID_t;
+
+#pragma pack( push, 4 )
+typedef struct CallbackMsg_t
+{
+    HSteamUser m_hSteamUser;
+    int m_iCallback;
+    uint8 *m_pubParam;
+    int m_cubParam;
+} CallbackMsg_t;
+#pragma pack( pop )
 #endif

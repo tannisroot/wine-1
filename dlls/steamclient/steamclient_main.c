@@ -120,14 +120,47 @@ void *CDECL CreateInterface(const char *name, int *return_code)
     return create_win_interface(name, steamclient_CreateInterface(name, return_code));
 }
 
-bool CDECL Steam_BGetCallback(HSteamPipe pipe, CallbackMsg_t *msg, int32 *ignored)
+#include "cb_converters.h"
+
+#include <pshpack8.h>
+struct winCallbackMsg_t
 {
-    TRACE("%u, %p, %p\n", pipe, msg, ignored);
+    HSteamUser m_hSteamUser;
+    int m_iCallback;
+    uint8 *m_pubParam;
+    int m_cubParam;
+};
+#include <poppack.h>
+
+static void *last_cb = NULL;
+
+bool CDECL Steam_BGetCallback(HSteamPipe pipe, struct winCallbackMsg_t *win_msg, int32 *ignored)
+{
+    bool ret;
+    CallbackMsg_t lin_msg;
+
+    TRACE("%u, %p, %p\n", pipe, win_msg, ignored);
 
     if(!load_steamclient())
         return 0;
 
-    return steamclient_BGetCallback(pipe, msg, ignored);
+    ret = steamclient_BGetCallback(pipe, &lin_msg, ignored);
+
+    if(ret){
+        win_msg->m_hSteamUser = lin_msg.m_hSteamUser;
+        win_msg->m_iCallback = lin_msg.m_iCallback;
+        switch(win_msg->m_iCallback | (lin_msg.m_cubParam << 16)){
+#include "cb_converters.dat"
+            default:
+                WARN("Unable to convert callback %u with Linux size %u\n",
+                        lin_msg.m_iCallback, lin_msg.m_cubParam);
+                /* hard fail to avoid data corruption */
+                return false;
+        }
+        last_cb = win_msg->m_pubParam;
+    }
+
+    return ret;
 }
 
 bool CDECL Steam_GetAPICallResult(HSteamPipe pipe, SteamAPICall_t call,
@@ -147,6 +180,9 @@ bool CDECL Steam_FreeLastCallback(HSteamPipe pipe)
 
     if(!load_steamclient())
         return 0;
+
+    HeapFree(GetProcessHeap(), 0, last_cb);
+    last_cb = NULL;
 
     return steamclient_FreeLastCallback(pipe);
 }
