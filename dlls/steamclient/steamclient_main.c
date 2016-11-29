@@ -154,8 +154,9 @@ bool CDECL Steam_BGetCallback(HSteamPipe pipe, struct winCallbackMsg_t *win_msg,
             default:
                 WARN("Unable to convert callback %u with Linux size %u\n",
                         lin_msg.m_iCallback, lin_msg.m_cubParam);
-                /* hard fail to avoid data corruption */
-                return false;
+                win_msg->m_pubParam = HeapAlloc(GetProcessHeap(), 0, lin_msg.m_cubParam);
+                memcpy(win_msg->m_pubParam, lin_msg.m_pubParam, lin_msg.m_cubParam);
+                break;
         }
         last_cb = win_msg->m_pubParam;
     }
@@ -163,15 +164,63 @@ bool CDECL Steam_BGetCallback(HSteamPipe pipe, struct winCallbackMsg_t *win_msg,
     return ret;
 }
 
+static int get_callback_len(int cb)
+{
+    switch(cb){
+#include "cb_getapi_sizes.dat"
+    }
+    WARN("Unrecognized expected callback: %u\n", cb);
+    return 0;
+}
+
 bool CDECL Steam_GetAPICallResult(HSteamPipe pipe, SteamAPICall_t call,
         void *callback, int callback_len, int cb_expected, bool *failed)
 {
+    void *lin_callback;
+    int lin_callback_len;
+    bool ret;
+
     TRACE("%u, x, %p, %u, %u, %p\n", pipe, callback, callback_len, cb_expected, failed);
 
     if(!load_steamclient())
         return 0;
 
-    return steamclient_GetAPICallResult(pipe, call, callback, callback_len, cb_expected, failed);
+    lin_callback_len = get_callback_len(cb_expected);
+    ERR("lin cb len: %u\n", lin_callback_len);
+    if(!lin_callback_len)
+        lin_callback_len = callback_len;
+    lin_callback = HeapAlloc(GetProcessHeap(), 0, lin_callback_len);
+
+    ret = steamclient_GetAPICallResult(pipe, call, lin_callback, lin_callback_len, cb_expected, failed);
+
+    if(cb_expected == 513){
+        struct abc {
+            int e;
+            int64 id;
+        } *x = lin_callback;
+        ERR("enum: 0x%x, id: 0x%llx\n", x->e, x->id);
+        ERR("addrs: %p %p\n", &x->e, &x->id);
+    }
+
+    if(ret){
+        switch(cb_expected){
+#include "cb_getapi_table.dat"
+        default:
+            WARN("Unknown callback\n");
+            memcpy(callback, lin_callback, lin_callback_len);
+            break;
+        }
+    }
+
+    if(cb_expected == 513){
+        struct winLobbyCreated_t_12 *x = callback;
+        ERR("win enum: 0x%x, id: 0x%llx\n", x->m_eResult, x->m_ulSteamIDLobby);
+        ERR("win addrs: %u %u\n",
+                offsetof(struct winLobbyCreated_t_12, m_eResult),
+                offsetof(struct winLobbyCreated_t_12, m_ulSteamIDLobby));
+    }
+
+    return ret;
 }
 
 bool CDECL Steam_FreeLastCallback(HSteamPipe pipe)

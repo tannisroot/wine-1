@@ -46,7 +46,15 @@ typedef int EUserUGCList,
         EUGCMatchingUGCType,
         EItemUpdateStatus,
         EItemStatistic,
-        EItemPreviewType
+        EItemPreviewType,
+        EAuthSessionResponse,
+        EHTTPStatusCode,
+        EDenyReason,
+        ERegisterActivationCodeResult,
+        EWorkshopVote,
+        EChatRoomEnterResponse,
+        ECheckFileSignature,
+        EBroadcastUploadResult
 ;
 typedef int EMatchMakingType;
 typedef int AudioPlayback_Status;
@@ -62,6 +70,7 @@ typedef struct RemoteStorageUpdatePublishedFileRequest_t { unsigned char a[40]; 
 typedef struct ControllerAnalogActionData_t { unsigned char a[13]; } ControllerAnalogActionData_t;
 typedef struct ControllerDigitalActionData_t { unsigned char a[2]; } ControllerDigitalActionData_t;
 typedef struct ControllerMotionData_t { unsigned char a[40]; } ControllerMotionData_t;
+typedef struct SteamUGCDetails_t { unsigned char a[9764]; } SteamUGCDetails_t;
 
 /* never dereferenced */
 typedef struct FriendGameInfo_t FriendGameInfo_t;
@@ -73,7 +82,6 @@ typedef struct ISteamMatchmakingPlayersResponse ISteamMatchmakingPlayersResponse
 typedef struct ISteamMatchmakingRulesResponse ISteamMatchmakingRulesResponse;
 typedef struct RemoteStorageUpdatePublishedFileRequest_t RemoteStorageUpdatePublishedFileRequest_t;
 typedef struct SteamControllerState001_t SteamControllerState001_t;
-typedef struct SteamUGCDetails_t SteamUGCDetails_t;
 typedef struct SteamItemDetails_t SteamItemDetails_t;
 
 /* FIXME: we don't care about fn pointer types, just pass 'em through */
