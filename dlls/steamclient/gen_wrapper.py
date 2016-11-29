@@ -357,7 +357,6 @@ def handle_callback_struct(sdkver, callback, cb_num):
     datfile.write("case 0x%08x: win_msg->m_cubParam = sizeof(struct win%s); win_msg->m_pubParam = HeapAlloc(GetProcessHeap(), 0, win_msg->m_cubParam); cb_%s(lin_msg.m_pubParam, win_msg->m_pubParam); break;\n" % (cb_id, handler_name, handler_name))
 
     hfile = open("cb_converters.h", "a")
-    hfile.write("#include <pshpack8.h>\n")
     hfile.write("struct win%s {\n" % handler_name)
     for m in callback.get_children():
         if m.kind == clang.cindex.CursorKind.FIELD_DECL:
@@ -365,11 +364,9 @@ def handle_callback_struct(sdkver, callback, cb_num):
                 hfile.write("    %s %s[%u];\n" % (m.type.element_type.spelling, m.displayname, m.type.element_count))
             else:
                 hfile.write("    %s %s;\n" % (m.type.spelling, m.displayname))
-    hfile.write("};\n")
-    hfile.write("#include <poppack.h>\n")
+    hfile.write("}  __attribute__ ((ms_struct));\n")
     hfile.write("extern void cb_%s(void *l, void *w);\n" % handler_name)
 
-    cppfile.write("#include <pshpack8.h>\n")
     cppfile.write("struct win%s {\n" % handler_name)
     for m in callback.get_children():
         if m.kind == clang.cindex.CursorKind.FIELD_DECL:
@@ -377,8 +374,7 @@ def handle_callback_struct(sdkver, callback, cb_num):
                 cppfile.write("    %s %s[%u];\n" % (m.type.element_type.spelling, m.displayname, m.type.element_count))
             else:
                 cppfile.write("    %s %s;\n" % (m.type.spelling, m.displayname))
-    cppfile.write("};\n")
-    cppfile.write("#include <poppack.h>\n")
+    cppfile.write("}  __attribute__ ((ms_struct));\n")
 
     cppfile.write("void cb_%s(void *l, void *w)\n{\n" % handler_name)
     cppfile.write("    %s *lin = (%s *)l;\n" % (callback.displayname, callback.displayname))
