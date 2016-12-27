@@ -104,4 +104,12 @@ fi
 
 # and run the application
 
+if [ -L ~/vtest_logs ]; then
+    export WINEDEBUG=+steamclient,+tid,+seh
+    mkdir -p "$HOME/tmp"
+    LOGFILE="$HOME/vtest_logs/$SteamGameId.$(date --iso-8601=seconds).log"
+    touch "$LOGFILE"
+    exec 1>>"$LOGFILE" 2>>"$LOGFILE"
+fi
+
 exec "$WINELOADER" "$@"
