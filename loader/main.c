@@ -227,6 +227,28 @@ int main( int argc, char *argv[] )
 {
     char error[1024];
     int i;
+    struct stat st;
+    const char *gameid;
+
+    if(lstat("/home/desktop/vtest_logs", &st) == 0 &&
+            (st.st_mode & S_IFLNK) != 0 &&
+            (gameid = getenv("SteamGameId"))){
+        char filename[256];
+        struct tm *tm;
+        time_t now = time(NULL);
+        tm = gmtime(&now);
+        snprintf(filename, sizeof(filename), "%s/vtest_logs/%s_%04u-%02u-%02u_%02u:%02u:%02u_%u.log", getenv("HOME"), gameid,
+                tm->tm_year + 1900,
+                tm->tm_mon + 1,
+                tm->tm_mday,
+                tm->tm_hour,
+                tm->tm_min,
+                tm->tm_sec,
+                getpid());
+        freopen(filename, "wa", stdout);
+        freopen(filename, "wa", stderr);
+        setenv("WINEDEBUG", "+process,+tid,+seh,+steamclient,+timestamp", 0);
+    }
 
     if (!getenv( "WINELOADERNOEXEC" ))  /* first time around */
     {
