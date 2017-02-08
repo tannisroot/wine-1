@@ -506,6 +506,7 @@ HANDLE WINAPI DECLSPEC_HOTPATCH CreateEventExW( SECURITY_ATTRIBUTES *sa, LPCWSTR
 HANDLE WINAPI DECLSPEC_HOTPATCH OpenEventA( DWORD access, BOOL inherit, LPCSTR name )
 {
     WCHAR buffer[MAX_PATH];
+    HANDLE ret;
 
     if (!name) return OpenEventW( access, inherit, NULL );
 
@@ -514,7 +515,13 @@ HANDLE WINAPI DECLSPEC_HOTPATCH OpenEventA( DWORD access, BOOL inherit, LPCSTR n
         SetLastError( ERROR_FILENAME_EXCED_RANGE );
         return 0;
     }
-    return OpenEventW( access, inherit, buffer );
+    ret = OpenEventW( access, inherit, buffer );
+
+    if(!ret && !strcmp(name, "Local\\SteamStart_SharedMemLock")){
+        ret = CreateEventA(NULL, 0, TRUE, name);
+    }
+
+    return ret;
 }
 
 
