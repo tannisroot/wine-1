@@ -217,3 +217,30 @@ bool CDECL Steam_FreeLastCallback(HSteamPipe pipe)
 
     return steamclient_FreeLastCallback(pipe);
 }
+
+void CDECL Breakpad_SteamMiniDumpInit(uint32_t a, const char *b, const char *c)
+{
+    TRACE("\n");
+}
+
+void CDECL Breakpad_SteamSetAppID(uint32_t appid)
+{
+    TRACE("\n");
+}
+
+int CDECL Breakpad_SteamSetSteamID(uint64_t steamid)
+{
+    TRACE("\n");
+    return 1;
+}
+
+int CDECL Breakpad_SteamWriteMiniDumpSetComment(const char *comment)
+{
+    TRACE("\n");
+    return 1;
+}
+
+void CDECL Breakpad_SteamWriteMiniDumpUsingExceptionInfoWithBuildId(int a, int b)
+{
+    TRACE("\n");
+}

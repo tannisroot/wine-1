@@ -1,10 +1,10 @@
 # Generated from /home/valve/steampfx/drive_c/Program Files/Steam/steamclient.dll by winedump
 
-1 stub Breakpad_SteamMiniDumpInit
-2 stub Breakpad_SteamSetAppID
-3 stub Breakpad_SteamSetSteamID
-4 stub Breakpad_SteamWriteMiniDumpSetComment
-5 stub Breakpad_SteamWriteMiniDumpUsingExceptionInfoWithBuildId
+1 cdecl Breakpad_SteamMiniDumpInit(long ptr ptr)
+2 cdecl Breakpad_SteamSetAppID(long)
+3 cdecl Breakpad_SteamSetSteamID(int64)
+4 cdecl Breakpad_SteamWriteMiniDumpSetComment(ptr)
+5 cdecl Breakpad_SteamWriteMiniDumpUsingExceptionInfoWithBuildId(long long)
 6 cdecl CreateInterface(ptr ptr)
 7 stub Steam_BConnected
 8 cdecl Steam_BGetCallback(long ptr ptr)
