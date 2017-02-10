@@ -6,6 +6,7 @@ import os
 import re
 
 sdk_versions = [
+    "139",
     "138a",
     "138",
     "137",

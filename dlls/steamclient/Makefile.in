@@ -34,7 +34,7 @@ C_SRCS = \
 CPP_SRCS = \
 	cppISteamClient_SteamClient017.cpp \
 	cppISteamUser_SteamUser019.cpp \
-	cb_converters_138a.cpp \
+	cb_converters_139.cpp \
 	cppISteamFriends_SteamFriends015.cpp \
 	cppISteamUtils_SteamUtils008.cpp \
 	cppISteamMatchmaking_SteamMatchMaking009.cpp \
@@ -48,7 +48,7 @@ CPP_SRCS = \
 	cppISteamMusicRemote_STEAMMUSICREMOTE_INTERFACE_VERSION001.cpp \
 	cppISteamHTTP_STEAMHTTP_INTERFACE_VERSION002.cpp \
 	cppISteamUnifiedMessages_STEAMUNIFIEDMESSAGES_INTERFACE_VERSION001.cpp \
-	cppISteamController_SteamController004.cpp \
+	cppISteamController_SteamController005.cpp \
 	cppISteamUGC_STEAMUGC_INTERFACE_VERSION009.cpp \
 	cppISteamAppList_STEAMAPPLIST_INTERFACE_VERSION001.cpp \
 	cppISteamHTMLSurface_STEAMHTMLSURFACE_INTERFACE_VERSION_003.cpp \
@@ -57,6 +57,7 @@ CPP_SRCS = \
 	cppISteamAppTicket_STEAMAPPTICKET_INTERFACE_VERSION001.cpp \
 	cppISteamGameServer_SteamGameServer012.cpp \
 	cppISteamGameServerStats_SteamGameServerStats001.cpp \
+	cppISteamController_SteamController004.cpp \
 	cppISteamRemoteStorage_STEAMREMOTESTORAGE_INTERFACE_VERSION013.cpp \
 	cb_converters_137.cpp \
 	cppISteamScreenshots_STEAMSCREENSHOTS_INTERFACE_VERSION002.cpp \
