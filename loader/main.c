@@ -247,7 +247,7 @@ int main( int argc, char *argv[] )
                 getpid());
         freopen(filename, "wa", stdout);
         freopen(filename, "wa", stderr);
-        setenv("WINEDEBUG", "+process,+tid,+seh,+steamclient,+timestamp", 0);
+        setenv("WINEDEBUG", "+process,+tid,+seh,+steamclient,+timestamp,+loaddll,+msgbox", 0);
     }
 
     if (!getenv( "WINELOADERNOEXEC" ))  /* first time around */
