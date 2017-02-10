@@ -89,6 +89,29 @@ files = [
     ]),
 ]
 
+aliases = {
+    #Some interface versions are not present in the public SDK
+    #headers, but are actually requested by games. It would be nice
+    #to verify that these interface versions are actually binary
+    #compatible. Lacking that, we hope the next highest version
+    #is compatible.
+    "SteamClient014":["SteamClient013"],
+    "SteamFriends011":["SteamFriends010"],
+    "SteamFriends013":["SteamFriends012"],
+    "SteamGameServer008":["SteamGameServer007", "SteamGameServer006"],
+    "SteamMatchMaking004":["SteamMatchMaking003"],
+    "SteamMatchMaking006":["SteamMatchMaking005"],
+    "STEAMREMOTESTORAGE_INTERFACE_VERSION004":["STEAMREMOTESTORAGE_INTERFACE_VERSION003"],
+    "STEAMREMOTESTORAGE_INTERFACE_VERSION008":["STEAMREMOTESTORAGE_INTERFACE_VERSION007"],
+    "STEAMREMOTESTORAGE_INTERFACE_VERSION010":["STEAMREMOTESTORAGE_INTERFACE_VERSION009"],
+    "STEAMUGC_INTERFACE_VERSION005":["STEAMUGC_INTERFACE_VERSION004"],
+    "STEAMUGC_INTERFACE_VERSION007":["STEAMUGC_INTERFACE_VERSION006"],
+    "SteamUser016":["SteamUser015"],
+    "STEAMUSERSTATS_INTERFACE_VERSION009":["STEAMUSERSTATS_INTERFACE_VERSION008"],
+    "SteamUtils004":["SteamUtils003"],
+    "SteamUtils008":["SteamUtils009"], #apps request newer than in any public sdk!
+}
+
 # TODO: we could do this automatically by creating temp files and
 # having clang parse those and detect when the MS-style padding results
 # in identical struct widths. But there's only a couple, so let's cheat...
@@ -98,7 +121,7 @@ skip_structs = [
         "SteamUGCRequestUGCDetailsResult_t_9764"
 ]
 
-print_sizes = [ "SteamUGCDetails_t" ]
+print_sizes = []
 
 class_versions = {}
 
@@ -305,6 +328,9 @@ WINE_DEFAULT_DEBUG_CHANNEL(steamclient);
 
     constructors = open("win_constructors_table.dat", "a")
     constructors.write("    {\"%s\", &create_%s},\n" % (iface_version, winclassname))
+    if iface_version in aliases.keys():
+        for alias in aliases[iface_version]:
+            constructors.write("    {\"%s\", &create_%s},\n" % (alias, winclassname))
 
 
 generated_cb_handlers = []
