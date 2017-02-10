@@ -434,7 +434,6 @@ HANDLE WINAPI CreateFileMappingW( HANDLE hFile, LPSECURITY_ATTRIBUTES sa,
 HANDLE WINAPI OpenFileMappingA( DWORD access, BOOL inherit, LPCSTR name )
 {
     WCHAR buffer[MAX_PATH];
-    HANDLE ret;
 
     if (!name) return OpenFileMappingW( access, inherit, NULL );
 
@@ -443,18 +442,7 @@ HANDLE WINAPI OpenFileMappingA( DWORD access, BOOL inherit, LPCSTR name )
         SetLastError( ERROR_FILENAME_EXCED_RANGE );
         return 0;
     }
-    ret = OpenFileMappingW( access, inherit, buffer );
-    if(!ret && !strcmp(name, "Local\\SteamStart_SharedMemFile")){
-        ret = CreateFileMappingA(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE,
-                0, 0x400, name);
-        if(ret){
-            Sleep(15000);
-            char *mem = MapViewOfFile(ret, FILE_MAP_ALL_ACCESS, 0, 0, 0);
-            mem[8] = GetCurrentProcessId();
-            UnmapViewOfFile(mem);
-        }
-    }
-    return ret;
+    return OpenFileMappingW( access, inherit, buffer );
 }
 
 
