@@ -331,7 +331,7 @@ WINE_DEFAULT_DEBUG_CHANNEL(steamclient);
     constructors.write("    {\"%s\", &create_%s},\n" % (iface_version, winclassname))
     if iface_version in aliases.keys():
         for alias in aliases[iface_version]:
-            constructors.write("    {\"%s\", &create_%s},\n" % (alias, winclassname))
+            constructors.write("    {\"%s\", &create_%s}, /* alias */\n" % (alias, winclassname))
 
 
 generated_cb_handlers = []
