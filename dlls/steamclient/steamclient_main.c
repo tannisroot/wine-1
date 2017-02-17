@@ -46,6 +46,8 @@ void *create_win_interface(const char *name, void *linux_side)
 {
     int i;
 
+    TRACE("trying to create %s\n", name);
+
     if(!linux_side)
         return NULL;
 
