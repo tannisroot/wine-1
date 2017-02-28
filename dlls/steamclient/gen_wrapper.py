@@ -96,21 +96,26 @@ aliases = {
     #to verify that these interface versions are actually binary
     #compatible. Lacking that, we hope the next highest version
     #is compatible.
-    "SteamClient014":["SteamClient013"],
-    "SteamFriends011":["SteamFriends010"],
-    "SteamFriends013":["SteamFriends012"],
-    "SteamGameServer008":["SteamGameServer007", "SteamGameServer006"],
-    "SteamMatchMaking004":["SteamMatchMaking003"],
-    "SteamMatchMaking006":["SteamMatchMaking005"],
-    "STEAMREMOTESTORAGE_INTERFACE_VERSION004":["STEAMREMOTESTORAGE_INTERFACE_VERSION003"],
-    "STEAMREMOTESTORAGE_INTERFACE_VERSION008":["STEAMREMOTESTORAGE_INTERFACE_VERSION007"],
-    "STEAMREMOTESTORAGE_INTERFACE_VERSION010":["STEAMREMOTESTORAGE_INTERFACE_VERSION009"],
-    "STEAMUGC_INTERFACE_VERSION005":["STEAMUGC_INTERFACE_VERSION004"],
-    "STEAMUGC_INTERFACE_VERSION007":["STEAMUGC_INTERFACE_VERSION006"],
-    "SteamUser016":["SteamUser015"],
-    "STEAMUSERSTATS_INTERFACE_VERSION009":["STEAMUSERSTATS_INTERFACE_VERSION008"],
-    "SteamUtils004":["SteamUtils003"],
+    "SteamClient012":["SteamClient013"],
     "SteamUtils008":["SteamUtils009"], #apps request newer than in any public sdk!
+
+
+    #leaving these commented-out. let's see if they turn up in practice,
+    #and handle them correctly if so.
+
+#    "SteamFriends011":["SteamFriends010"],
+#    "SteamFriends013":["SteamFriends012"],
+#    "SteamGameServer008":["SteamGameServer007", "SteamGameServer006"],
+#    "SteamMatchMaking004":["SteamMatchMaking003"],
+#    "SteamMatchMaking006":["SteamMatchMaking005"],
+#    "STEAMREMOTESTORAGE_INTERFACE_VERSION004":["STEAMREMOTESTORAGE_INTERFACE_VERSION003"],
+#    "STEAMREMOTESTORAGE_INTERFACE_VERSION008":["STEAMREMOTESTORAGE_INTERFACE_VERSION007"],
+#    "STEAMREMOTESTORAGE_INTERFACE_VERSION010":["STEAMREMOTESTORAGE_INTERFACE_VERSION009"],
+#    "STEAMUGC_INTERFACE_VERSION005":["STEAMUGC_INTERFACE_VERSION004"],
+#    "STEAMUGC_INTERFACE_VERSION007":["STEAMUGC_INTERFACE_VERSION006"],
+#    "SteamUser016":["SteamUser015"],
+#    "STEAMUSERSTATS_INTERFACE_VERSION009":["STEAMUSERSTATS_INTERFACE_VERSION008"],
+#    "SteamUtils004":["SteamUtils003"],
 }
 
 # TODO: we could do this automatically by creating temp files and
