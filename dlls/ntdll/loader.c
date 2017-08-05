@@ -3801,6 +3801,32 @@ void WINAPI LdrInitializeThunk( CONTEXT *context, void **entry, ULONG_PTR unknow
 
 
 /***********************************************************************
+ *           elevate_process
+ */
+static void elevate_process( void )
+{
+    NTSTATUS status;
+    HANDLE token;
+
+    if (!(token = __wine_create_default_token( TRUE )))
+    {
+        ERR( "Failed to create admin token\n" );
+        return;
+    }
+
+    SERVER_START_REQ( replace_process_token )
+    {
+        req->token = wine_server_obj_handle( token );
+        if ((status = wine_server_call( req )))
+            ERR( "Failed to replace process token: %08x\n", status );
+    }
+    SERVER_END_REQ;
+
+    NtClose( token );
+}
+
+
+/***********************************************************************
  *           load_global_options
  */
 static void load_global_options(void)
@@ -3857,6 +3883,7 @@ static void load_global_options(void)
 }
 
 
+
 /***********************************************************************
  *           RtlImageDirectoryEntryToData   (NTDLL.@)
  */
@@ -3891,7 +3918,6 @@ PVOID WINAPI RtlImageDirectoryEntryToData( HMODULE module, BOOL image, WORD dir,
     /* not mapped as image, need to find the section containing the virtual address */
     return RtlImageRvaToVa( nt, module, addr, NULL );
 }
-
 
 /***********************************************************************
  *           RtlImageRvaToSection   (NTDLL.@)
@@ -4224,7 +4250,7 @@ void __wine_process_init(void)
                                       's','y','s','t','e','m','3','2','\\',
                                       'k','e','r','n','e','l','3','2','.','d','l','l',0};
     static const WCHAR globalflagW[] = {'G','l','o','b','a','l','F','l','a','g',0};
-
+    ACTIVATION_CONTEXT_RUN_LEVEL_INFORMATION runlevel;
     WINE_MODREF *wm;
     NTSTATUS status;
     ANSI_STRING func_name;
@@ -4275,6 +4301,16 @@ void __wine_process_init(void)
     LdrQueryImageFileExecutionOptions( &wm->ldr.FullDllName, globalflagW, REG_DWORD,
                                        &NtCurrentTeb()->Peb->NtGlobalFlag, sizeof(DWORD), NULL );
     heap_set_debug_flags( GetProcessHeap() );
+
+    /* elevate process if necessary */
+    status = RtlQueryInformationActivationContext( 0, NULL, 0, RunlevelInformationInActivationContext,
+                                                   &runlevel, sizeof(runlevel), NULL );
+    if (!status && (runlevel.RunLevel == ACTCTX_RUN_LEVEL_HIGHEST_AVAILABLE ||
+                    runlevel.RunLevel == ACTCTX_RUN_LEVEL_REQUIRE_ADMIN))
+    {
+        TRACE( "Application requested admin rights (run level %d)\n", runlevel.RunLevel );
+        elevate_process();  /* FIXME: the process exists with a wrong token for a short time */
+    }
 
     /* the main exe needs to be the first in the load order list */
     RemoveEntryList( &wm->ldr.InLoadOrderModuleList );
