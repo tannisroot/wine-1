@@ -671,8 +671,13 @@ PRUNTIME_FUNCTION WINAPI RtlLookupFunctionEntry( ULONG_PTR pc, ULONG_PTR *base,
  */
 NTSTATUS WINAPI NtContinue( CONTEXT *context, BOOLEAN alert )
 {
-    FIXME( "(%p, %d) stub!\n", context, alert );
-    return STATUS_NOT_IMPLEMENTED;
+    TRACE( "(%p, %d) stub!\n", context, alert );
+
+    /* NtSetContextThread will not have the intended behavior for a partial context. */
+    if ((context->ContextFlags & CONTEXT_FULL) != CONTEXT_FULL)
+        return STATUS_NOT_IMPLEMENTED;
+
+    return NtSetContextThread( GetCurrentThread(), context );
 }
 
 /*************************************************************
