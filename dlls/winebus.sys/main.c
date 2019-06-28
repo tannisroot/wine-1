@@ -496,16 +496,31 @@ static NTSTATUS handle_IRP_MN_QUERY_ID(DEVICE_OBJECT *device, IRP *irp)
 
 static NTSTATUS fdo_pnp_dispatch(DEVICE_OBJECT *device, IRP *irp)
 {
+    static const WCHAR SDL_enabledW[] = {'E','n','a','b','l','e',' ','S','D','L',0};
+    static const UNICODE_STRING SDL_enabled = {sizeof(SDL_enabledW) - sizeof(WCHAR), sizeof(SDL_enabledW), (WCHAR*)SDL_enabledW};
     IO_STACK_LOCATION *irpsp = IoGetCurrentIrpStackLocation(irp);
     NTSTATUS ret;
 
     switch (irpsp->MinorFunction)
     {
     case IRP_MN_START_DEVICE:
+        if (check_bus_option(&SDL_enabled, 1))
+        {
+            if (sdl_driver_init() == STATUS_SUCCESS)
+                return STATUS_SUCCESS;
+        }
+        udev_driver_init();
+        iohid_driver_init();
+        irp->IoStatus.u.Status = STATUS_SUCCESS;
+        break;
     case IRP_MN_SURPRISE_REMOVAL:
         irp->IoStatus.u.Status = STATUS_SUCCESS;
         break;
     case IRP_MN_REMOVE_DEVICE:
+        udev_driver_unload();
+        iohid_driver_unload();
+        sdl_driver_unload();
+
         irp->IoStatus.u.Status = STATUS_SUCCESS;
         IoSkipCurrentIrpStackLocation(irp);
         ret = IoCallDriver(bus_pdo, irp);
@@ -901,9 +916,6 @@ static NTSTATUS WINAPI driver_add_device(DRIVER_OBJECT *driver, DEVICE_OBJECT *p
 
 static void WINAPI driver_unload(DRIVER_OBJECT *driver)
 {
-    udev_driver_unload();
-    iohid_driver_unload();
-    sdl_driver_unload();
     NtClose(driver_key);
 }
 
@@ -979,8 +991,6 @@ static void mouse_device_create(void)
 
 NTSTATUS WINAPI DriverEntry( DRIVER_OBJECT *driver, UNICODE_STRING *path )
 {
-    static const WCHAR SDL_enabledW[] = {'E','n','a','b','l','e',' ','S','D','L',0};
-    static const UNICODE_STRING SDL_enabled = {sizeof(SDL_enabledW) - sizeof(WCHAR), sizeof(SDL_enabledW), (WCHAR*)SDL_enabledW};
     OBJECT_ATTRIBUTES attr = {0};
     NTSTATUS ret;
 
@@ -998,16 +1008,6 @@ NTSTATUS WINAPI DriverEntry( DRIVER_OBJECT *driver, UNICODE_STRING *path )
     driver->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] = hid_internal_dispatch;
     driver->DriverExtension->AddDevice = driver_add_device;
     driver->DriverUnload = driver_unload;
-
-    mouse_device_create();
-
-    if (check_bus_option(&SDL_enabled, 1))
-    {
-        if (sdl_driver_init() == STATUS_SUCCESS)
-            return STATUS_SUCCESS;
-    }
-    udev_driver_init();
-    iohid_driver_init();
 
     return STATUS_SUCCESS;
 }
