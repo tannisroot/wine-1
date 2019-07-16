@@ -301,6 +301,10 @@ static void update_relative_valuators(XIAnyClassInfo **valuators, int n_valuator
         thread_data->x_pos_valuator.min = thread_data->x_pos_valuator.max = 0;
     if (thread_data->y_pos_valuator.min >= thread_data->y_pos_valuator.max)
         thread_data->y_pos_valuator.min = thread_data->y_pos_valuator.max = 0;
+
+    thread_data->x_pos_valuator.value = 0;
+    thread_data->y_pos_valuator.value = 0;
+    thread_data->wheel_valuator.value = 0;
 }
 #endif
 
@@ -1842,6 +1846,7 @@ static BOOL X11DRV_RawMotion( XGenericEventCookie *xev )
     double dx = 0, dy = 0, dw = 0, val;
     double raw_dx = 0, raw_dy = 0, raw_val;
     double x_scale = 1, y_scale = 1;
+    double x_accum = 0, y_accum = 0, w_accum = 0;
     struct x11drv_thread_data *thread_data = x11drv_thread_data();
     XIValuatorClassInfo *x_pos, *y_pos, *wheel;
 
@@ -1853,6 +1858,10 @@ static BOOL X11DRV_RawMotion( XGenericEventCookie *xev )
     x_pos = &thread_data->x_pos_valuator;
     y_pos = &thread_data->y_pos_valuator;
     wheel = &thread_data->wheel_valuator;
+
+    x_accum = x_pos->value;
+    y_accum = y_pos->value;
+    w_accum = wheel->value;
 
     input.type             = INPUT_MOUSE;
     input.u.mi.mouseData   = 0;
@@ -1880,9 +1889,9 @@ static BOOL X11DRV_RawMotion( XGenericEventCookie *xev )
             input.u.mi.dwFlags |= (x_pos->min < x_pos->max ? MOUSEEVENTF_VIRTUALDESK : 0) |
                                   (x_pos->mode == XIModeAbsolute ? MOUSEEVENTF_ABSOLUTE : 0);
             if (x_pos->mode == XIModeAbsolute)
-                input.u.mi.dx = virtual_rect.left + (dx - x_pos->min) * x_scale;
+                x_accum = virtual_rect.left + (dx - x_pos->min) * x_scale;
             else
-                input.u.mi.dx = dx * x_scale;
+                x_accum += dx * x_scale;
         }
         if (i == y_pos->number)
         {
@@ -1891,23 +1900,37 @@ static BOOL X11DRV_RawMotion( XGenericEventCookie *xev )
             input.u.mi.dwFlags |= (y_pos->min < y_pos->max ? MOUSEEVENTF_VIRTUALDESK : 0) |
                                   (y_pos->mode == XIModeAbsolute ? MOUSEEVENTF_ABSOLUTE : 0);
             if (y_pos->mode == XIModeAbsolute)
-                input.u.mi.dy = virtual_rect.top + (dy - y_pos->min) * y_scale;
+                y_accum = virtual_rect.top + (dy - y_pos->min) * y_scale;
             else
-                input.u.mi.dy = dy * y_scale;
+                y_accum += dy * y_scale;
         }
         if (i == wheel->number)
         {
             dw = val;
             input.u.mi.dwFlags |= MOUSEEVENTF_WHEEL;
-            input.u.mi.mouseData = dw * thread_data->wheel_scale;
+            w_accum += dw * thread_data->wheel_scale;
         }
     }
+
+    /* Accumulate the fractional parts so they aren't lost after casting
+     * successive motion values to integral fields.
+     *
+     * Note: It looks like raw_dx, raw_dy and raw_dw are already
+     * integral values but that may be wrong.
+     */
+    input.u.mi.dx = (LONG)x_accum;
+    input.u.mi.dy = (LONG)y_accum;
+    input.u.mi.mouseData = (DWORD)w_accum;
 
     if (broken_rawevents && is_old_motion_event( xev->serial ))
     {
         TRACE( "pos %d,%d old serial %lu, ignoring\n", input.u.mi.dx, input.u.mi.dy, xev->serial );
         return FALSE;
     }
+
+    x_pos->value = x_accum - input.u.mi.dx;
+    y_pos->value = y_accum - input.u.mi.dy;
+    wheel->value = w_accum - input.u.mi.mouseData;
 
     if (x_pos->mode == XIModeAbsolute)
     {
@@ -1916,8 +1939,15 @@ static BOOL X11DRV_RawMotion( XGenericEventCookie *xev )
     }
     else if (!thread_data->xi2_rawinput_only)
     {
-        TRACE( "pos %d,%d w:%d (event %f,%f,%f)\n", input.u.mi.dx, input.u.mi.dy, input.u.mi.mouseData, dx, dy, dw );
-        __wine_send_input( 0, &input, SEND_HWMSG_WINDOW );
+        if ((dy || dy || dw) && !(input.u.mi.dx || input.u.mi.dy || input.u.mi.mouseData))
+        {
+            TRACE( "accumulating raw motion (event %f,%f,%f accum %f,%f,%f)\n", dx, dy, dw, x_pos->value, y_pos->value, wheel->value );
+        }
+        else
+        {
+            TRACE( "pos %d,%d w:%d (event %f,%f,%f)\n", input.u.mi.dx, input.u.mi.dy, input.u.mi.mouseData, dx, dy, dw );
+            __wine_send_input( 0, &input, SEND_HWMSG_WINDOW );
+        }
     }
     else
     {
