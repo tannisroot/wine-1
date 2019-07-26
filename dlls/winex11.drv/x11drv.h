@@ -341,6 +341,8 @@ struct x11drv_thread_data
     enum { xi_unavailable = -1, xi_unknown, xi_disabled, xi_enabled } xi2_state; /* XInput2 state */
     XIValuatorClassInfo x_pos_valuator;
     XIValuatorClassInfo y_pos_valuator;
+    XIValuatorClassInfo wheel_valuator;
+    double   wheel_scale;
     int      xi2_core_pointer;     /* XInput2 core pointer id */
     int      xi2_rawinput_only;
 #endif
@@ -429,6 +431,7 @@ enum x11drv_atoms
     XATOM_RAW_CAP_HEIGHT,
     XATOM_Rel_X,
     XATOM_Rel_Y,
+    XATOM_Rel_Vert_Scroll,
     XATOM_Abs_X,
     XATOM_Abs_Y,
     XATOM_WM_PROTOCOLS,
