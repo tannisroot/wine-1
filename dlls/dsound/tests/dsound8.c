@@ -1500,6 +1500,33 @@ static void test_gargle_parameters(IDirectSoundBuffer8 *secondary8)
             ok(params.dwWaveShape == DSFXGARGLE_WAVE_TRIANGLE, "got %d\n", params.dwWaveShape);
         }
 
+        rc = IDirectSoundFXGargle_SetAllParameters(gargle, NULL);
+        ok(rc == E_POINTER, "got: %08x\n", rc);
+
+        /* Out of range Min */
+        params.dwRateHz    = 0;
+
+        rc = IDirectSoundFXGargle_SetAllParameters(gargle, &params);
+        ok(rc == E_INVALIDARG, "got: %08x\n", rc);
+
+        /* Out of range Max */
+        params.dwRateHz    = 1001;
+        rc = IDirectSoundFXGargle_SetAllParameters(gargle, &params);
+        ok(rc == E_INVALIDARG, "got: %08x\n", rc);
+
+        params.dwRateHz    = 800;
+        params.dwWaveShape = DSFXGARGLE_WAVE_SQUARE;
+        rc = IDirectSoundFXGargle_SetAllParameters(gargle, &params);
+        ok(rc == S_OK, "got: %08x\n", rc);
+
+        rc = IDirectSoundFXGargle_GetAllParameters(gargle, &params);
+        ok(rc == DS_OK, "Failed: %08x\n", rc);
+        if (rc == DS_OK)
+        {
+            ok(params.dwRateHz == 800, "got %d\n", params.dwRateHz);
+            ok(params.dwWaveShape == DSFXGARGLE_WAVE_SQUARE, "got %d\n", params.dwWaveShape);
+        }
+
         IDirectSoundFXGargle_Release(gargle);
     }
 }
