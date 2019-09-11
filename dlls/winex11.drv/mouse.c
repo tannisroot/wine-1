@@ -289,9 +289,9 @@ static void update_relative_valuators(XIAnyClassInfo **valuators, int n_valuator
 
 
 /***********************************************************************
- *              enable_xinput2
+ *              X11DRV_XInput2_Enable
  */
-static void enable_xinput2(void)
+void X11DRV_XInput2_Enable(void)
 {
 #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
     struct x11drv_thread_data *data = x11drv_thread_data();
@@ -323,9 +323,21 @@ static void enable_xinput2(void)
     mask.mask_len = sizeof(mask_bits);
     mask.deviceid = XIAllMasterDevices;
     memset( mask_bits, 0, sizeof(mask_bits) );
+
     XISetMask( mask_bits, XI_DeviceChanged );
     XISetMask( mask_bits, XI_RawMotion );
-    XISetMask( mask_bits, XI_ButtonPress );
+
+    if (GetWindowThreadProcessId( GetDesktopWindow(), NULL ) == GetCurrentThreadId())
+    {
+        XISetMask( mask_bits, XI_RawButtonPress );
+        XISetMask( mask_bits, XI_RawButtonRelease );
+        data->xi2_rawinput_only = TRUE;
+    }
+    else
+    {
+        XISetMask( mask_bits, XI_ButtonPress );
+        data->xi2_rawinput_only = FALSE;
+    }
 
     pXISelectEvents( data->display, DefaultRootWindow( data->display ), &mask, 1 );
 
@@ -338,9 +350,9 @@ static void enable_xinput2(void)
 }
 
 /***********************************************************************
- *              disable_xinput2
+ *              X11DRV_XInput2_Disable
  */
-static void disable_xinput2(void)
+void X11DRV_XInput2_Disable(void)
 {
 #ifdef HAVE_X11_EXTENSIONS_XINPUT2_H
     struct x11drv_thread_data *data = x11drv_thread_data();
@@ -400,7 +412,7 @@ static BOOL grab_clipping_window( const RECT *clip )
     }
 
     /* enable XInput2 unless we are already clipping */
-    if (!data->clip_hwnd) enable_xinput2();
+    if (!data->clip_hwnd) X11DRV_XInput2_Enable();
 
     if (data->xi2_state != xi_enabled)
     {
@@ -430,7 +442,7 @@ static BOOL grab_clipping_window( const RECT *clip )
 
     if (!clipping_cursor)
     {
-        disable_xinput2();
+        X11DRV_XInput2_Disable();
         DestroyWindow( msg_hwnd );
         return FALSE;
     }
@@ -511,7 +523,7 @@ LRESULT clip_cursor_notify( HWND hwnd, HWND prev_clip_hwnd, HWND new_clip_hwnd )
         TRACE( "clip hwnd reset from %p\n", hwnd );
         data->clip_hwnd = 0;
         data->clip_reset = GetTickCount();
-        disable_xinput2();
+        X11DRV_XInput2_Disable();
         DestroyWindow( hwnd );
     }
     else if (hwnd == GetForegroundWindow())  /* request to clip */
@@ -650,7 +662,7 @@ static void send_mouse_input( HWND hwnd, Window window, unsigned int state, INPU
         }
         input->u.mi.dx += clip_rect.left;
         input->u.mi.dy += clip_rect.top;
-        __wine_send_input( hwnd, input, SEND_HWMSG_RAWINPUT|SEND_HWMSG_WINDOW );
+        __wine_send_input( hwnd, input, SEND_HWMSG_WINDOW );
         return;
     }
 
@@ -690,7 +702,7 @@ static void send_mouse_input( HWND hwnd, Window window, unsigned int state, INPU
         SERVER_END_REQ;
     }
 
-    __wine_send_input( hwnd, input, SEND_HWMSG_RAWINPUT|SEND_HWMSG_WINDOW );
+    __wine_send_input( hwnd, input, SEND_HWMSG_WINDOW );
 }
 
 #ifdef SONAME_LIBXCURSOR
@@ -1636,7 +1648,7 @@ void move_resize_window( HWND hwnd, int dir )
             input.u.mi.dwFlags     = button_up_flags[button - 1] | MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_MOVE;
             input.u.mi.time        = GetTickCount();
             input.u.mi.dwExtraInfo = 0;
-            __wine_send_input( hwnd, &input, SEND_HWMSG_RAWINPUT|SEND_HWMSG_WINDOW );
+            __wine_send_input( hwnd, &input, SEND_HWMSG_WINDOW );
         }
 
         while (PeekMessageW( &msg, 0, 0, 0, PM_REMOVE ))
@@ -1817,6 +1829,7 @@ static BOOL X11DRV_RawMotion( XGenericEventCookie *xev )
     x_rel = &thread_data->x_rel_valuator;
     y_rel = &thread_data->y_rel_valuator;
 
+    input.type             = INPUT_MOUSE;
     input.u.mi.mouseData   = 0;
     input.u.mi.dwFlags     = MOUSEEVENTF_MOVE;
     input.u.mi.time        = EVENT_x11_time_to_win32_time( event->time );
@@ -1852,10 +1865,44 @@ static BOOL X11DRV_RawMotion( XGenericEventCookie *xev )
         return FALSE;
     }
 
-    TRACE( "pos %d,%d (event %f,%f)\n", input.u.mi.dx, input.u.mi.dy, dx, dy );
+    if (!thread_data->xi2_rawinput_only)
+    {
+        TRACE( "pos %d,%d (event %f,%f)\n", input.u.mi.dx, input.u.mi.dy, dx, dy );
+        __wine_send_input( 0, &input, SEND_HWMSG_WINDOW );
+    }
+    else
+    {
+        TRACE( "raw pos %d,%d (event %f,%f)\n", input.u.mi.dx, input.u.mi.dy, dx, dy );
+        __wine_send_input( 0, &input, SEND_HWMSG_RAWINPUT );
+    }
+    return TRUE;
+}
 
-    input.type = INPUT_MOUSE;
-    __wine_send_input( 0, &input, SEND_HWMSG_RAWINPUT|SEND_HWMSG_WINDOW );
+/***********************************************************************
+ *           X11DRV_RawButtonEvent
+ */
+static BOOL X11DRV_RawButtonEvent( XGenericEventCookie *cookie )
+{
+    struct x11drv_thread_data *thread_data = x11drv_thread_data();
+    XIRawEvent *event = cookie->data;
+    int button = event->detail - 1;
+    INPUT input;
+
+    if (button >= NB_BUTTONS) return FALSE;
+    if (thread_data->xi2_state != xi_enabled) return FALSE;
+    if (event->deviceid != thread_data->xi2_core_pointer) return FALSE;
+
+    TRACE( "raw button %u %s\n", button, event->evtype == XI_RawButtonRelease ? "up" : "down" );
+
+    input.type             = INPUT_MOUSE;
+    input.u.mi.dx          = 0;
+    input.u.mi.dy          = 0;
+    input.u.mi.mouseData   = event->evtype == XI_RawButtonRelease ? button_up_data[button] : button_down_data[button];
+    input.u.mi.dwFlags     = event->evtype == XI_RawButtonRelease ? button_up_flags[button] : button_down_flags[button];
+    input.u.mi.time        = EVENT_x11_time_to_win32_time(event->time);
+    input.u.mi.dwExtraInfo = 0;
+
+    __wine_send_input( 0, &input, SEND_HWMSG_RAWINPUT );
     return TRUE;
 }
 
@@ -1922,6 +1969,10 @@ BOOL X11DRV_GenericEvent( HWND hwnd, XEvent *xev )
         break;
     case XI_RawMotion:
         ret = X11DRV_RawMotion( event );
+        break;
+    case XI_RawButtonPress:
+    case XI_RawButtonRelease:
+        ret = X11DRV_RawButtonEvent( event );
         break;
 
     default:
