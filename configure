@@ -18127,6 +18127,7 @@ fi
     LIBS=$ac_save_LIBS
     ;;
 esac
+RT_LIBS=-lrt
 
 if test "x$with_ldap" != "xno"
 then
