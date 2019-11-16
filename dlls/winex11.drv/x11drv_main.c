@@ -144,7 +144,6 @@ static const char * const atom_names[NB_XATOMS - FIRST_XATOM] =
     "RAW_CAP_HEIGHT",
     "Rel X",
     "Rel Y",
-    "Rel Vert Scroll",
     "Abs X",
     "Abs Y",
     "WM_PROTOCOLS",
